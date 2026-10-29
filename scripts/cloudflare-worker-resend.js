@@ -62,7 +62,7 @@ export default {
         },
         body: JSON.stringify({
           from: env.FROM_EMAIL || "TORRES & TORRES <onboarding@resend.dev>",
-          to: [env.DESTINATION_EMAIL || "torrestorresabogadosasociados@gmail.com"],
+          to: [env.DESTINATION_EMAIL || "johans.galeanot@gmail.com"],
           reply_to: data.email,
           subject: `[Consulta Legal] ${data.service || 'General'} - ${data.fullName}`,
           html: `

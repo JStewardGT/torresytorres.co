@@ -392,7 +392,7 @@ export const CONTACT_INFO = {
   whatsapp: '+57 322 291 5599',
   whatsappRaw: '573222915599',
   whatsappMessage: 'Hola, me gustaría agendar una consulta jurídica con TORRES & TORRES Abogados Asociados sobre el servicio: ',
-  email: 'johans.galeanot@gmail.com',
+  email: 'contacto@torresytorres.co',
   address: 'Calle 11 # 8-54 Oficina 303',
   city: 'Bogotá D.C., Colombia',
   schedule: 'Lunes a Viernes: 8:00 AM – 6:00 PM',

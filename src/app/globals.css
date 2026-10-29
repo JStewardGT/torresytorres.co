@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-jakarta: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --bg-primary-dark: #081225;
+  --bg-secondary-dark: #0D1C39;
+  --bg-light: #E4E3E3;
+  --bg-light-surface: #F4F4F2;
+  --accent-ice: #D1E3FF;
+  --accent-gold: #C5A880;
+  --text-dark-primary: #081225;
+  --text-dark-muted: #53627A;
+  --text-light-primary: #F7F7F6;
+  --text-light-muted: #8F9EB6;
+}
+
+/* Lenis Smooth Scroll Recommended CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Custom Base Styles */
+html {
+  background-color: var(--bg-primary-dark);
+  color: var(--text-light-primary);
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow-x: hidden;
+  background-color: var(--bg-primary-dark);
+  min-height: 100vh;
+}
+
+/* Selection Color */
+::selection {
+  background-color: #C5A880;
+  color: #081225;
+}
+
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #081225;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E2D4A;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C5A880;
+}
+
+/* Typography display utility */
+.font-display {
+  font-family: var(--font-cormorant), 'Playfair Display', Georgia, serif;
+}
+
+.font-sans {
+  font-family: var(--font-jakarta), 'Inter', system-ui, sans-serif;
+}
+
+/* Clip path reveal utilities */
+.clip-reveal-hidden {
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  transform: translateY(40px);
+  opacity: 0;
+}
+
+.clip-reveal-visible {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Noise overlay utility */
+.bg-noise {
+  background-image: radial-gradient(rgba(209, 227, 255, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Horizontal section helper */
+.pin-wrap-horizontal {
+  will-change: transform;
+}
+
+/* 3D Perspective Container */
+.perspective-container {
+  perspective: 1400px;
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}

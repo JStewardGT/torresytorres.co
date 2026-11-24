@@ -31,15 +31,10 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
       if (!section || !pinWrapper || !panels) return;
 
       const getScrollAmount = () => {
-        const cards = panels.querySelectorAll<HTMLElement>('.firm-card');
-        if (!cards.length) return 0;
-
-        const lastCard = cards[cards.length - 1];
-        const lastCardRight = lastCard.offsetLeft + lastCard.offsetWidth;
-        const rightMargin = window.innerWidth >= 768 ? 64 : 24;
-        const targetScreenRight = window.innerWidth - rightMargin;
-
-        return Math.max(0, lastCardRight - targetScreenRight);
+        const container = containerRef.current;
+        if (!panels || !container) return 0;
+        // Ensure the last card is fully visible with comfortable right margin
+        return Math.max(0, panels.scrollWidth - container.clientWidth + 48);
       };
 
       const mm = gsap.matchMedia();
@@ -47,9 +42,12 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
       mm.add('(min-width: 769px)', () => {
         ScrollTrigger.refresh();
 
-        const tween = gsap.to(panels, {
-          x: () => -getScrollAmount(),
-          ease: 'none',
+        const scrollDistance = getScrollAmount();
+        // Generous reading pause so the final card stays in view before unpinning
+        const pauseDistance = 500;
+        const totalPinDistance = scrollDistance + pauseDistance;
+
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             pin: pinWrapper, // PIN THE INNER WRAPPER, NEVER THE REACT ROOT SECTION ELEMENT!
@@ -57,12 +55,14 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
             anticipatePin: 1,
             scrub: 0.8,
             start: 'top top',
-            end: () => `+=${getScrollAmount()}`,
+            end: () => `+=${totalPinDistance}`,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               if (progressBar) {
+                // Progress bar tracks horizontal scroll progress
+                const horizontalProgress = Math.min(1, (self.progress * totalPinDistance) / scrollDistance);
                 gsap.to(progressBar, {
-                  scaleX: self.progress,
+                  scaleX: horizontalProgress,
                   transformOrigin: 'left center',
                   duration: 0.05,
                   ease: 'none',
@@ -72,8 +72,18 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
           },
         });
 
+        // 1. Horizontal slide
+        tl.to(panels, {
+          x: () => -scrollDistance,
+          ease: 'none',
+          duration: scrollDistance,
+        });
+
+        // 2. Reading pause at the end so the user can comfortably view Card 4 before unpinning
+        tl.to({}, { duration: pauseDistance });
+
         return () => {
-          tween.kill();
+          tl.kill();
         };
       });
 
@@ -97,7 +107,7 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
         className="w-full md:h-screen md:min-h-screen md:max-h-screen overflow-hidden flex flex-col justify-between"
       >
         {/* Top Banner on Stone Background */}
-        <div className="w-full px-6 md:px-16 pt-8 md:pt-10 pb-4 max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between border-b border-[#081225]/15 shrink-0">
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16 pb-6 flex flex-col md:flex-row md:items-end justify-between border-b border-[#081225]/15 shrink-0">
           <div>
             <div className="inline-flex items-center space-x-2 text-xs font-mono text-[#081225]/70 uppercase tracking-widest mb-2">
               <span className="w-2 h-2 rounded-full bg-[#081225]" />
@@ -115,16 +125,16 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
         {/* Horizontal Panels Wrapper */}
         <div
           ref={containerRef}
-          className="relative w-full flex-1 flex items-center overflow-hidden py-4 md:py-6"
+          className="relative max-w-7xl mx-auto w-full px-6 md:px-12 flex-1 flex items-center overflow-hidden py-6 md:py-8"
         >
           <div
             ref={panelsRef}
-            className="flex flex-col md:flex-row items-stretch gap-6 md:gap-8 px-6 md:px-16 w-full md:w-max will-change-transform"
+            className="flex flex-col md:flex-row items-stretch gap-6 md:gap-8 w-full md:w-max will-change-transform pr-6 md:pr-16"
           >
             {FIRM_METHODOLOGY.map((method, idx) => (
               <div
                 key={idx}
-                className="firm-card w-full md:w-[540px] lg:w-[580px] h-auto md:h-[52vh] md:max-h-[480px] md:min-h-[380px] shrink-0 rounded-3xl bg-[#F4F4F2] border border-[#081225]/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-[#081225]/30 transition-all duration-300"
+                className="firm-card w-full md:w-[460px] lg:w-[500px] h-auto md:h-[50vh] md:max-h-[460px] md:min-h-[360px] shrink-0 rounded-3xl bg-[#F4F4F2] border border-[#081225]/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-[#081225]/30 transition-all duration-300"
               >
                 {/* Giant background step number */}
                 <div className="absolute top-2 right-6 font-display text-8xl md:text-9xl font-bold text-[#081225]/[0.04] select-none pointer-events-none">
@@ -218,7 +228,7 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
         </div>
 
         {/* Bottom Progress Bar & Indicator on Desktop */}
-        <div className="w-full px-6 md:px-16 py-3 border-t border-[#081225]/10 hidden md:flex items-center justify-between text-[11px] font-mono text-[#081225]/60 shrink-0">
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 border-t border-[#081225]/10 hidden md:flex items-center justify-between text-[11px] font-mono text-[#081225]/60 shrink-0">
           <span>Desplazamiento Horizontal / Metodología</span>
           <div className="w-48 h-1 bg-[#081225]/10 rounded-full overflow-hidden mx-4">
             <div

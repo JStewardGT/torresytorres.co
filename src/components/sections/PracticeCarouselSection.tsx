@@ -53,6 +53,10 @@ export default function PracticeCarouselSection({
     // Only drag on left click (button 0) or touch
     if (e.button !== 0) return;
 
+    // Do not initiate drag or capture pointer when interacting with buttons, links or form controls
+    const control = (e.target as HTMLElement).closest('button, a, input, select, textarea, [role="button"]');
+    if (control) return;
+
     isPointerDown.current = true;
     dragStartX.current = e.clientX;
     hasDragged.current = false;
@@ -287,9 +291,10 @@ export default function PracticeCarouselSection({
 
                     <button
                       type="button"
+                      onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!hasDragged.current) onSelectPillar(pillar.id);
+                        onSelectPillar(pillar.id);
                       }}
                       className="inline-flex items-center justify-center space-x-2.5 px-6 py-3 rounded-xl bg-accent-gold/20 hover:bg-accent-gold text-accent-gold hover:text-primary-dark border border-accent-gold/40 text-xs uppercase tracking-widest font-sans font-medium transition-all duration-300 group shrink-0 cursor-pointer"
                     >

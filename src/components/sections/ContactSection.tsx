@@ -16,6 +16,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { CONTACT_INFO, SERVICES } from '@/data/services';
+import CustomSelect from '@/components/ui/CustomSelect';
 
 const DEFAULT_ENDPOINT = 'https://torres-contact-api.johans-galeanot.workers.dev';
 
@@ -55,7 +56,10 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
     setStatus('loading');
     setErrorMessage('');
 
-    const endpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT || DEFAULT_ENDPOINT;
+    const endpoint =
+      (typeof import.meta !== 'undefined' && import.meta.env?.PUBLIC_CONTACT_ENDPOINT) ||
+      process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ||
+      DEFAULT_ENDPOINT;
 
     try {
       const response = await fetch(endpoint, {
@@ -397,18 +401,17 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
                     >
                       Servicio Requerido *
                     </label>
-                    <select
+                    <CustomSelect
                       id="serviceSelect"
+                      name="service"
                       value={selectedService}
-                      onChange={(e) => setSelectedService(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-primary-dark/90 border border-accent-ice/15 text-primary-light text-xs sm:text-sm focus:outline-none focus:border-accent-gold transition-colors cursor-pointer"
-                    >
-                      {SERVICES.map((s) => (
-                        <option key={s.id} value={s.title} className="bg-primary-dark text-primary-light">
-                          {s.title} ({s.badge})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setSelectedService(val)}
+                      options={SERVICES.map((s) => ({
+                        value: s.title,
+                        label: s.title,
+                        badge: s.badge,
+                      }))}
+                    />
                   </div>
                 </div>
 

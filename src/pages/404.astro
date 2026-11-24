@@ -1,0 +1,31 @@
+---
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout title="404 — Página no encontrada | TORRES & TORRES Abogados Asociados">
+  <main class="min-h-screen w-full bg-[#081225] text-primary-light flex items-center justify-center px-6">
+    <div class="max-w-md text-center space-y-6">
+      <div class="inline-flex items-center space-x-2.5 px-3.5 py-1.5 rounded-full bg-secondary-dark/80 border border-accent-ice/20">
+        <span class="w-2 h-2 rounded-full bg-accent-gold"></span>
+        <span class="text-[11px] font-mono tracking-widest text-accent-ice uppercase">Error 404</span>
+      </div>
+      
+      <h1 class="font-display text-4xl sm:text-5xl font-light text-primary-light">
+        Página no encontrada
+      </h1>
+      
+      <p class="font-sans text-sm text-accent-ice/70 leading-relaxed">
+        El recurso solicitado no está disponible o ha sido trasladado. Puede regresar a la portada principal de la firma.
+      </p>
+
+      <div>
+        <a
+          href="/"
+          class="inline-flex items-center space-x-3 px-6 py-3 rounded-xl bg-accent-gold text-primary-dark font-sans text-xs uppercase tracking-widest font-semibold hover:bg-accent-ice transition-all duration-300 shadow-glow-gold"
+        >
+          Volver al Inicio
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>

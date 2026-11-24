@@ -6,7 +6,9 @@
 # testing
 /coverage
 
-# next.js
+# astro & build outputs
+/.astro/
+/dist/
 /.next/
 /out/
 

@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import Header from '@/components/ui/Header';
 import FullscreenMenu from '@/components/ui/FullscreenMenu';
@@ -13,7 +11,6 @@ import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activePillarFilter, setActivePillarFilter] = useState<string | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [preselectedContactService, setPreselectedContactService] = useState<string | undefined>(undefined);
@@ -23,12 +20,14 @@ export default function HomePage() {
   const handleOpenPillarInCatalog = (pillarId: string) => {
     setActivePillarFilter(pillarId);
     setSelectedServiceId(null);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('torres-select-pillar', { detail: pillarId }));
+    }
     scrollTo('#catalogo-servicios');
   };
 
   const handleOpenSpecificService = (serviceId: string) => {
     setSelectedServiceId(serviceId);
-    setIsDrawerOpen(false);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('torres-open-service', { detail: serviceId }));
     }
@@ -63,7 +62,6 @@ export default function HomePage() {
 
       {/* 1. Hero Section (Monumental typography, clip-path reveal, R3F subtle background) */}
       <HeroSection
-        onOpenDrawer={() => setIsDrawerOpen(true)}
         onOpenConsultation={handleOpenConsultation}
       />
 
@@ -75,10 +73,8 @@ export default function HomePage() {
 
       {/* 3. Immersive Filter Panel & 10 Services Interactive Catalog */}
       <ServicesFilterDrawer
-        isDrawerOpen={isDrawerOpen}
         initialPillarFilter={activePillarFilter}
         selectedServiceId={selectedServiceId}
-        onCloseDrawer={() => setIsDrawerOpen(false)}
         onSelectServiceForContact={handleSelectServiceForContact}
       />
 

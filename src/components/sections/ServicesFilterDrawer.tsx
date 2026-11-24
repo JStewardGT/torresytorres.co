@@ -14,22 +14,18 @@ import {
   ChevronRight,
   Shield,
 } from 'lucide-react';
-import { SERVICES, PRACTICE_PILLARS, ServiceItem } from '@/data/services';
+import { SERVICES, PRACTICE_PILLARS, type ServiceItem } from '@/data/services';
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 interface ServicesFilterDrawerProps {
-  isDrawerOpen?: boolean;
   initialPillarFilter?: string | null;
   selectedServiceId?: string | null;
-  onCloseDrawer?: () => void;
   onSelectServiceForContact?: (serviceTitle: string) => void;
 }
 
 export default function ServicesFilterDrawer({
-  isDrawerOpen = false,
   initialPillarFilter = null,
   selectedServiceId = null,
-  onCloseDrawer,
   onSelectServiceForContact,
 }: ServicesFilterDrawerProps) {
   const [activePillar, setActivePillar] = useState<string>('todos');
@@ -56,7 +52,7 @@ export default function ServicesFilterDrawer({
     }
   }, [selectedServiceId]);
 
-  // Listen for direct custom event to open service details without re-rendering parent tree
+  // Listen for direct custom events to open service details or filter by pillar without re-rendering parent tree
   useEffect(() => {
     const handleCustomServiceOpen = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
@@ -68,15 +64,27 @@ export default function ServicesFilterDrawer({
       }
     };
 
+    const handleCustomPillarSelect = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        setActivePillar(customEvent.detail);
+        setActiveApproach('todos');
+        setSearchQuery('');
+      }
+    };
+
     window.addEventListener('torres-open-service', handleCustomServiceOpen);
+    window.addEventListener('torres-select-pillar', handleCustomPillarSelect);
+
     return () => {
       window.removeEventListener('torres-open-service', handleCustomServiceOpen);
+      window.removeEventListener('torres-select-pillar', handleCustomPillarSelect);
     };
   }, []);
 
-  // Lock scroll when drawer or service detail modal is active
+  // Lock scroll when service detail modal is active
   useEffect(() => {
-    if (isDrawerOpen || activeServiceDetail) {
+    if (activeServiceDetail) {
       stop();
     } else {
       start();
@@ -84,7 +92,7 @@ export default function ServicesFilterDrawer({
     return () => {
       start();
     };
-  }, [isDrawerOpen, activeServiceDetail, stop, start]);
+  }, [activeServiceDetail, stop, start]);
 
   // Filtered list calculation
   const filteredServices = useMemo(() => {
@@ -108,7 +116,6 @@ export default function ServicesFilterDrawer({
   }, [activePillar, activeApproach, searchQuery]);
 
   const handleConsultService = (service: ServiceItem) => {
-    if (onCloseDrawer) onCloseDrawer();
     setActiveServiceDetail(null);
     if (onSelectServiceForContact) {
       onSelectServiceForContact(service.title);
@@ -119,94 +126,104 @@ export default function ServicesFilterDrawer({
   };
 
   const contentMarkup = (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {/* Search and Filters Bar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 p-5 rounded-2xl bg-secondary-dark/60 border border-accent-ice/10 backdrop-blur-md">
-        {/* Search input */}
-        <div className="relative flex-grow max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-accent-ice/40" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por especialidad o contingencia..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-primary-dark/80 border border-accent-ice/15 text-primary-light placeholder-accent-ice/40 text-xs font-sans focus:outline-none focus:border-accent-gold transition-colors"
-          />
-          {searchQuery && (
+      <div className="p-4 sm:p-5 rounded-2xl bg-secondary-dark/70 border border-accent-ice/15 backdrop-blur-md shadow-luxury space-y-4">
+        {/* Top Row: Search Input + Approach Selector */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+          {/* Search input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-accent-ice/40" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por especialidad, alcance o materia jurídica..."
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-primary-dark/90 border border-accent-ice/15 text-primary-light placeholder-accent-ice/40 text-xs sm:text-sm font-sans focus:outline-none focus:border-accent-gold transition-colors"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-accent-ice/40 hover:text-accent-ice transition-colors"
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Approach Filter: Ambos vs Preventivo vs Litigioso */}
+          <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-primary-dark/90 border border-accent-ice/15 shrink-0 self-start sm:self-auto">
+            <span className="text-[11px] font-mono text-accent-ice/50 px-2 hidden md:inline">
+              Enfoque:
+            </span>
             <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-accent-ice/40 hover:text-accent-ice"
+              type="button"
+              onClick={() => setActiveApproach('todos')}
+              className={`px-3 py-1.5 text-xs rounded-lg font-sans transition-all ${
+                activeApproach === 'todos'
+                  ? 'bg-accent-gold text-primary-dark font-semibold shadow-sm'
+                  : 'text-accent-ice/60 hover:text-accent-ice'
+              }`}
             >
-              <X className="w-3.5 h-3.5" />
+              Ambos
             </button>
-          )}
+            <button
+              type="button"
+              onClick={() => setActiveApproach('preventivo')}
+              className={`px-3 py-1.5 text-xs rounded-lg font-sans transition-all ${
+                activeApproach === 'preventivo'
+                  ? 'bg-accent-gold text-primary-dark font-semibold shadow-sm'
+                  : 'text-accent-ice/60 hover:text-accent-ice'
+              }`}
+            >
+              Preventivo
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveApproach('litigioso')}
+              className={`px-3 py-1.5 text-xs rounded-lg font-sans transition-all ${
+                activeApproach === 'litigioso'
+                  ? 'bg-accent-gold text-primary-dark font-semibold shadow-sm'
+                  : 'text-accent-ice/60 hover:text-accent-ice'
+              }`}
+            >
+              Litigioso
+            </button>
+          </div>
         </div>
 
-        {/* Pillars Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+        {/* Bottom Row: Practice Pillars Filter Tabs */}
+        <div className="pt-3 border-t border-accent-ice/10 flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={() => setActivePillar('todos')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-sans transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-sans transition-all ${
               activePillar === 'todos'
-                ? 'bg-accent-ice text-primary-dark font-medium shadow-glow-ice'
-                : 'text-accent-ice/60 hover:text-accent-ice hover:bg-primary-dark/50'
+                ? 'bg-accent-ice text-primary-dark font-semibold shadow-glow-ice'
+                : 'bg-primary-dark/50 border border-accent-ice/10 text-accent-ice/70 hover:text-accent-ice hover:border-accent-ice/25'
             }`}
           >
-            Todos ({SERVICES.length})
+            Todas las Especialidades ({SERVICES.length})
           </button>
           {PRACTICE_PILLARS.map((p) => {
             const count = SERVICES.filter((s) => s.pillarId === p.id).length;
             return (
               <button
+                type="button"
                 key={p.id}
                 onClick={() => setActivePillar(p.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-sans transition-all whitespace-nowrap ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-sans transition-all whitespace-nowrap ${
                   activePillar === p.id
-                    ? 'bg-accent-ice text-primary-dark font-medium shadow-glow-ice'
-                    : 'text-accent-ice/60 hover:text-accent-ice hover:bg-primary-dark/50'
+                    ? 'bg-accent-ice text-primary-dark font-semibold shadow-glow-ice'
+                    : 'bg-primary-dark/50 border border-accent-ice/10 text-accent-ice/70 hover:text-accent-ice hover:border-accent-ice/25'
                 }`}
               >
-                {p.title.split('&')[0]} ({count})
+                {p.title.split('&')[0].trim()} ({count})
               </button>
             );
           })}
-        </div>
-
-        {/* Approach Filter: Preventivo vs Litigioso */}
-        <div className="flex items-center space-x-1 border-t lg:border-t-0 lg:border-l border-accent-ice/10 pt-3 lg:pt-0 lg:pl-4 shrink-0">
-          <span className="text-[11px] font-mono text-accent-ice/40 mr-1 hidden sm:inline">
-            Enfoque:
-          </span>
-          <button
-            onClick={() => setActiveApproach('todos')}
-            className={`px-2.5 py-1 text-[11px] rounded font-sans transition-colors ${
-              activeApproach === 'todos'
-                ? 'bg-accent-gold text-primary-dark font-medium'
-                : 'text-accent-ice/50 hover:text-accent-ice'
-            }`}
-          >
-            Ambos
-          </button>
-          <button
-            onClick={() => setActiveApproach('preventivo')}
-            className={`px-2.5 py-1 text-[11px] rounded font-sans transition-colors ${
-              activeApproach === 'preventivo'
-                ? 'bg-accent-gold text-primary-dark font-medium'
-                : 'text-accent-ice/50 hover:text-accent-ice'
-            }`}
-          >
-            Preventivo
-          </button>
-          <button
-            onClick={() => setActiveApproach('litigioso')}
-            className={`px-2.5 py-1 text-[11px] rounded font-sans transition-colors ${
-              activeApproach === 'litigioso'
-                ? 'bg-accent-gold text-primary-dark font-medium'
-                : 'text-accent-ice/50 hover:text-accent-ice'
-            }`}
-          >
-            Litigioso
-          </button>
         </div>
       </div>
 
@@ -324,48 +341,6 @@ export default function ServicesFilterDrawer({
           {contentMarkup}
         </div>
       </section>
-
-      {/* Slide-over Full Drawer when triggered externally */}
-      {isDrawerOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-[#081225]/80 backdrop-blur-md flex justify-end"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Filtro interactivo de servicios"
-        >
-          <div
-            className="w-full max-w-4xl bg-primary-dark border-l border-accent-ice/20 h-full overflow-y-auto p-6 md:p-12 relative flex flex-col justify-between shadow-2xl"
-          >
-            <div>
-              <div className="flex items-center justify-between border-b border-accent-ice/10 pb-6 mb-8">
-                <div>
-                  <span className="text-xs font-mono text-accent-gold uppercase tracking-widest block">
-                    / Immersive Filter Panel
-                  </span>
-                  <h3 className="font-display text-2xl md:text-3xl text-primary-light">
-                    Catálogo de los 10 Servicios
-                  </h3>
-                </div>
-                {onCloseDrawer && (
-                  <button
-                    onClick={onCloseDrawer}
-                    className="p-2.5 rounded-full border border-accent-ice/20 hover:border-accent-gold text-accent-ice hover:text-accent-gold transition-colors"
-                    aria-label="Cerrar panel de servicios"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-
-              {contentMarkup}
-            </div>
-
-            <div className="pt-8 mt-12 border-t border-accent-ice/10 text-xs text-accent-ice/40 font-mono text-center">
-              TORRES & TORRES Abogados Asociados — Consultoría Legal de Élite
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Detailed Modal for Individual Service View */}
       {activeServiceDetail && (

@@ -28,10 +28,10 @@ export default function Header({ onOpenMenu, onOpenConsultation }: HeaderProps) 
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-40 border-b transition-[background-color,border-color,padding,box-shadow] duration-500 ease-out ${
         isScrolled
-          ? 'bg-[#081225]/85 backdrop-blur-xl border-b border-accent-ice/10 py-3.5 shadow-luxury'
-          : 'bg-transparent py-6'
+          ? 'bg-[#081225]/85 backdrop-blur-xl border-accent-ice/10 py-3.5 shadow-luxury'
+          : 'bg-transparent border-transparent py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">

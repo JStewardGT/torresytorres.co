@@ -7,6 +7,7 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [hoverLabel, setHoverLabel] = useState<string | null>(null);
 
@@ -25,6 +26,8 @@ export default function CustomCursor() {
     const follower = followerRef.current;
     if (!cursor || !follower) return;
 
+    let hasMovedOnce = false;
+
     // Use gsap.quickTo() for high performance 60fps tracking
     const xTo = gsap.quickTo(cursor, 'x', { duration: 0.1, ease: 'power3' });
     const yTo = gsap.quickTo(cursor, 'y', { duration: 0.1, ease: 'power3' });
@@ -33,10 +36,26 @@ export default function CustomCursor() {
     const followerYTo = gsap.quickTo(follower, 'y', { duration: 0.45, ease: 'power3' });
 
     const onMouseMove = (e: MouseEvent) => {
-      xTo(e.clientX);
-      yTo(e.clientY);
-      followerXTo(e.clientX);
-      followerYTo(e.clientY);
+      if (!hasMovedOnce) {
+        hasMovedOnce = true;
+        gsap.set(cursor, { x: e.clientX, y: e.clientY });
+        gsap.set(follower, { x: e.clientX, y: e.clientY });
+        setIsVisible(true);
+      } else {
+        if (!isVisible) setIsVisible(true);
+        xTo(e.clientX);
+        yTo(e.clientY);
+        followerXTo(e.clientX);
+        followerYTo(e.clientY);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setIsVisible(false);
+    };
+
+    const handleMouseEnter = () => {
+      setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -61,10 +80,14 @@ export default function CustomCursor() {
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     document.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.documentElement.addEventListener('mouseleave', handleMouseLeave);
+    document.documentElement.addEventListener('mouseenter', handleMouseEnter);
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseover', handleMouseOver);
+      document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
+      document.documentElement.removeEventListener('mouseenter', handleMouseEnter);
     };
   }, []);
 
@@ -75,13 +98,25 @@ export default function CustomCursor() {
       {/* Central precise dot */}
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 w-2 h-2 -ml-1 -mt-1 rounded-full bg-accent-gold pointer-events-none z-[9999] mix-blend-difference"
+        style={{
+          transform: 'translate(-100px, -100px)',
+          opacity: isVisible ? 1 : 0,
+        }}
+        className={`fixed top-0 left-0 w-2 h-2 -ml-1 -mt-1 rounded-full bg-accent-gold pointer-events-none z-[9999] mix-blend-difference transition-opacity duration-200 ${
+          isVisible ? 'opacity-100' : 'opacity-0 invisible'
+        }`}
       />
 
       {/* Outer fluid follower ring */}
       <div
         ref={followerRef}
-        className={`fixed top-0 left-0 rounded-full pointer-events-none z-[9998] transition-[width,height,background-color,border-color] duration-300 flex items-center justify-center text-[10px] tracking-widest uppercase font-sans text-primary-dark font-medium ${
+        style={{
+          transform: 'translate(-100px, -100px)',
+          opacity: isVisible ? 1 : 0,
+        }}
+        className={`fixed top-0 left-0 rounded-full pointer-events-none z-[9998] transition-[width,height,background-color,border-color,opacity] duration-300 flex items-center justify-center text-[10px] tracking-widest uppercase font-sans text-primary-dark font-medium ${
+          isVisible ? 'opacity-100' : 'opacity-0 invisible'
+        } ${
           isHovering
             ? hoverLabel
               ? 'w-20 h-20 -ml-10 -mt-10 bg-accent-ice text-primary-dark border border-accent-ice/80 scale-100 shadow-glow-ice'

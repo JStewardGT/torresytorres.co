@@ -1,0 +1,146 @@
+---
+import '../styles/globals.css';
+import { SERVICES, CONTACT_INFO } from '@/data/services';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'TORRES & TORRES Abogados Asociados | Firma Jurídica Corporativa',
+  description = 'Firma jurídica de alto nivel en Colombia. Especialistas en Derecho Corporativo, Litigios Complejos, Protección Patrimonial y Relaciones Laborales Estratégicas.',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://torresytorres.co');
+
+const keywords = [
+  'TORRES & TORRES Abogados',
+  'Abogados Corporativos Bogotá',
+  'Derecho de Sociedades Colombia',
+  'Derecho Empresarial',
+  'Consultoría Empresarial',
+  'Gestión de Proyectos Legales',
+  'Derecho del Consumidor',
+  'Derecho de Daños Personales',
+  'Derecho de Sucesiones',
+  'Derecho de Propiedad e Inmobiliario',
+  'Derecho Laboral Patronal',
+  'Consultoría Legal Estratégica',
+  'Firma de Abogados Asociados',
+].join(', ');
+
+// Comprehensive JSON-LD Schema for LegalService
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LegalService',
+  '@id': 'https://torresytorres.co/#organization',
+  name: CONTACT_INFO.firmName,
+  legalName: 'TORRES & TORRES Abogados Asociados S.A.S.',
+  url: 'https://torresytorres.co',
+  description:
+    'Firma jurídica de élite especializada en derecho societario, litigios complejos, estructuración patrimonial y consultoría laboral estratégica.',
+  telephone: CONTACT_INFO.phone,
+  email: CONTACT_INFO.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CONTACT_INFO.address,
+    addressLocality: 'Bogotá',
+    addressRegion: 'Cundinamarca',
+    postalCode: CONTACT_INFO.postalCode,
+    addressCountry: 'CO',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 4.6784,
+    longitude: -74.0536,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '18:00',
+    },
+  ],
+  priceRange: '$$$$',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Catálogo Oficial de Servicios Jurídicos',
+    itemListElement: SERVICES.map((service, index) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: service.title,
+        description: service.shortDescription,
+        serviceType: service.pillarTitle,
+        offers: {
+          '@type': 'Offer',
+          availability: 'https://schema.org/InStock',
+        },
+      },
+      position: index + 1,
+    })),
+  },
+};
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="theme-color" content="#081225" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content="TORRES & TORRES Abogados Asociados" />
+    <meta name="creator" content="TORRES & TORRES Abogados Asociados" />
+    <meta name="publisher" content="TORRES & TORRES Abogados Asociados" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://torresytorres.co" />
+    <meta property="og:title" content="TORRES & TORRES Abogados Asociados | Rigor Jurídico & Visión Estratégica" />
+    <meta property="og:description" content="Soluciones jurídicas de vanguardia para la alta dirección corporativa, transacciones complejas, controversias de alto calibre y perpetuación patrimonial." />
+    <meta property="og:site_name" content="TORRES & TORRES Abogados Asociados" />
+    <meta property="og:locale" content="es_CO" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TORRES & TORRES Abogados Asociados" />
+    <meta name="twitter:description" content="Rigor técnico, defensa inquebrantable y estrategia corporativa en Colombia." />
+
+    <!-- Fonts preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured Data JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Google Analytics (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y64B1HGD7H"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-Y64B1HGD7H');
+    </script>
+
+    <!-- Microsoft Clarity -->
+    <script is:inline>
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "z5hpqh0qsz");
+    </script>
+  </head>
+  <body class="bg-[#081225] text-primary-light min-h-screen selection:bg-accent-gold selection:text-primary-dark font-sans relative">
+    <slot />
+  </body>
+</html>

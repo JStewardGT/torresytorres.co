@@ -1,6 +1,6 @@
 # TORRES & TORRES Abogados Asociados
 
-Sitio web corporativo de alta gama para la firma jurídica **"TORRES & TORRES Abogados Asociados"**, diseñado con inspiración editorial de lujo europeo (referencia: [Lacourte Raquin Tatar](https://lacourte.com/en/home) por Studio Bonhomme) y desarrollado bajo una arquitectura de máximo rendimiento en **Next.js (App Router)** con exportación estática (`output: 'export'`), animaciones GSAP sincronizadas con Lenis y WebGL ligero con React Three Fiber (R3F).
+Sitio web corporativo de alta gama para la firma jurídica **"TORRES & TORRES Abogados Asociados"**, diseñado con inspiración editorial de lujo europeo (referencia: [Lacourte Raquin Tatar](https://lacourte.com/en/home) por Studio Bonhomme) y desarrollado bajo una arquitectura moderna de máximo rendimiento en **Astro 5** con islas de componentes **React**, animaciones GSAP sincronizadas con Lenis y WebGL ligero con React Three Fiber (R3F).
 
 ---
 
@@ -19,17 +19,17 @@ Sitio web corporativo de alta gama para la firma jurídica **"TORRES & TORRES Ab
 
 ## ⚡ Reglas de Oro de Rendimiento Cumplidas
 1. **Zero Main-Thread Blocking en Carga Inicial:**
-   - La suite 3D de `@react-three/fiber` y `three` está completamente aislada en `src/components/canvas/HeroCanvasWrapper.tsx` y se carga bajo demanda mediante `next/dynamic({ ssr: false })` con un elegante fallback visual en CSS puro (`CanvasFallback.tsx`).
-   - El bundle inicial de First Load JS se mantiene ultra ligero (~159 kB total).
+   - La suite 3D de `@react-three/fiber` y `three` está completamente aislada en `src/components/canvas/HeroCanvasWrapper.tsx` y se carga bajo demanda mediante `React.lazy` y `Suspense` con un elegante fallback visual en CSS puro (`CanvasFallback.tsx`).
+   - Astro genera el HTML estático en tiempo de compilación y empaqueta Three.js en un chunk asíncrono diferido (`dist/_astro/HeroCanvas.*.js`), logrando un First Load JS ultra liviano (~44 kB gzipped de runtime cliente).
 2. **Renderizado Bajo Demanda (On-Demand Loop):**
    - El canvas 3D opera estrictamente con `frameloop="demand"` y `dpr={[1, 1.5]}`, consumiendo **0% de GPU/CPU** en estado estático e invalidando frames únicamente durante interacción de scroll o movimiento del cursor.
 3. **Animaciones GSAP Limpias:**
-   - Implementadas con `@gsap/react` (`useGSAP()`) y `gsap.context()` para eliminación automática de listeners al desmontar componentes.
+   - Implementadas con `@gsap/react` (`useGSAP()`) y `ScrollTrigger` para manipulación de timelines y sección horizontal con pineo interactivo.
    - Puntero magnético de precisión implementado con `gsap.quickTo()` para garantizar 60fps estables.
 4. **Smooth Scroll Sincronizado:**
-   - `lenis` integrado directamente al ticker de GSAP (`gsap.ticker.add`) para que `ScrollTrigger` y el desplazamiento inercial estén sincronizados a nivel de frame.
+   - `lenis` integrado directamente al ticker de GSAP (`gsap.ticker.add`) para que `ScrollTrigger` y el desplazamiento inercial estén sincronizados a nivel de frame en `SmoothScrollProvider`.
 5. **SEO & Accesibilidad:**
-   - Datos estructurados `JSON-LD` (`LegalService` / `Attorney`) incluidos en `<head>` detallando los 10 servicios oficiales, horarios y ubicación en Bogotá D.C.
+   - Estructurado en `Layout.astro` con datos `JSON-LD` (`LegalService`), OpenGraph, Twitter Cards, Google Analytics (GTag) y Microsoft Clarity, detallando los 10 servicios oficiales, horarios y ubicación en Bogotá D.C.
 
 ---
 
@@ -56,15 +56,62 @@ El sitio estructura y desglosa con exactitud las 10 áreas de práctica de la fi
 
 ---
 
+## 📁 Estructura del Proyecto
+
+```
+torresytorres.co/
+├── astro.config.mjs         # Configuración de Astro, Vite SSR y alias
+├── tailwind.config.ts       # Tokens de diseño, fuentes y paleta cromática
+├── tsconfig.json            # Configuración TypeScript estricta para Astro
+├── public/                  # Archivos estáticos y .well-known
+├── src/
+│   ├── env.d.ts             # Tipos de Astro y cliente
+│   ├── layouts/
+│   │   └── Layout.astro     # Plantilla base (SEO, JSON-LD, Analytics, Fonts)
+│   ├── pages/
+│   │   ├── index.astro      # Página principal (isla React con client:load)
+│   │   └── 404.astro        # Página 404 estática
+│   ├── styles/
+│   │   └── globals.css      # Estilos globales, Lenis y directivas Tailwind
+│   ├── data/
+│   │   └── services.ts      # Modelos y contenidos de los 10 servicios y 4 pilares
+│   └── components/
+│       ├── App.tsx          # Wrapper raíz de scroll y cursor
+│       ├── HomePage.tsx     # Ensamblaje interactivo de secciones
+│       ├── canvas/          # Three.js WebGL & fallback
+│       ├── providers/       # SmoothScrollProvider (Lenis + GSAP)
+│       ├── sections/        # Hero, Carrusel, Catálogo Drawer, Firm, Contacto
+│       └── ui/              # Header, FullscreenMenu, Footer, CustomCursor
+└── scripts/
+    └── cloudflare-worker-resend.js # Worker serverless para envío de formularios
+```
+
+---
+
 ## 🛠️ Comandos de Ejecución
 
 ```bash
 # Desarrollo local
 npm run dev
 
-# Compilación y generación de exportación estática ('out/')
+# Chequeo estático de tipos y templates
+npm run check
+
+# Compilación y generación de salida estática ('dist/')
 npm run build
 
-# Previsualización del sitio estático exportado
-npx serve out
+# Previsualización del sitio estático generado
+npm run preview
 ```
+
+---
+
+## 🌐 Variables de Entorno
+
+Crear un archivo `.env.local` en la raíz del proyecto para configurar el endpoint del formulario de contacto:
+
+```env
+PUBLIC_CONTACT_ENDPOINT=https://torres-contact-api.johans-galeanot.workers.dev
+```
+
+*(También se mantiene compatibilidad retrospectiva con `NEXT_PUBLIC_CONTACT_ENDPOINT`).*

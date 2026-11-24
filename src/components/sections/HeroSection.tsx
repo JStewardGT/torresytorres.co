@@ -3,17 +3,16 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ArrowDown, ArrowUpRight, Scale, ShieldCheck } from 'lucide-react';
+import { ArrowDown, ShieldCheck } from 'lucide-react';
 import { DynamicHeroCanvas } from '@/components/canvas/HeroCanvasWrapper';
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 import { FIRM_STATS } from '@/data/services';
 
 interface HeroSectionProps {
-  onOpenDrawer: () => void;
   onOpenConsultation: () => void;
 }
 
-export default function HeroSection({ onOpenDrawer, onOpenConsultation }: HeroSectionProps) {
+export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
   const { scrollTo } = useSmoothScroll();
 
@@ -29,12 +28,13 @@ export default function HeroSection({ onOpenDrawer, onOpenConsultation }: HeroSe
       )
         .fromTo(
           '.hero-reveal-line',
-          { clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)', y: 40, opacity: 0 },
+          { y: 60, opacity: 0 },
           {
-            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
             y: 0,
             opacity: 1,
             stagger: 0.15,
+            duration: 1.1,
+            clearProps: 'all',
           },
           '-=0.4'
         )
@@ -83,22 +83,22 @@ export default function HeroSection({ onOpenDrawer, onOpenConsultation }: HeroSe
         </div>
 
         {/* Monumental Headline with line-by-line reveal */}
-        <div className="space-y-1 md:space-y-2 mb-8">
-          <div className="overflow-hidden">
-            <h1 className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-primary-light leading-[1.05]">
+        <div className="space-y-2 md:space-y-3 mb-8">
+          <div className="overflow-hidden pb-4 md:pb-6 -mb-4 md:-mb-6">
+            <h1 className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-primary-light leading-[1.18] pb-2">
               Rigor técnico,
             </h1>
           </div>
-          <div className="overflow-hidden">
-            <div className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-primary-light leading-[1.05] flex flex-wrap items-baseline gap-x-4">
+          <div className="overflow-hidden pb-4 md:pb-6 -mb-4 md:-mb-6">
+            <div className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-primary-light leading-[1.18] pb-2 flex flex-wrap items-baseline gap-x-4">
               <span>defensa</span>
               <span className="italic font-normal text-accent-gold font-display">
                 inquebrantable
               </span>
             </div>
           </div>
-          <div className="overflow-hidden">
-            <h2 className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-accent-ice leading-[1.05]">
+          <div className="overflow-hidden pb-4 md:pb-6 -mb-4 md:-mb-6">
+            <h2 className="hero-reveal-line font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-accent-ice leading-[1.18] pb-2">
               &amp; estrategia corporativa.
             </h2>
           </div>
@@ -120,11 +120,11 @@ export default function HeroSection({ onOpenDrawer, onOpenConsultation }: HeroSe
           </button>
 
           <button
-            onClick={onOpenDrawer}
-            className="hero-action-btn inline-flex items-center space-x-3 px-7 py-4 rounded-xl bg-secondary-dark/80 hover:bg-secondary-dark border border-accent-ice/20 hover:border-accent-ice/60 text-primary-light font-sans text-xs uppercase tracking-widest font-medium transition-all duration-300 backdrop-blur-md group"
+            onClick={() => scrollTo('#catalogo-servicios')}
+            className="hero-action-btn inline-flex items-center space-x-3 px-7 py-4 rounded-xl bg-secondary-dark/80 hover:bg-secondary-dark border border-accent-ice/20 hover:border-accent-ice/60 text-primary-light font-sans text-xs uppercase tracking-widest font-medium transition-all duration-300 backdrop-blur-md group cursor-pointer"
           >
             <span>Catálogo de 10 Servicios</span>
-            <ArrowUpRight className="w-4 h-4 text-accent-gold transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ArrowDown className="w-4 h-4 text-accent-gold transition-transform group-hover:translate-y-1" />
           </button>
 
           <button

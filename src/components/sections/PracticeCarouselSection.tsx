@@ -2,21 +2,19 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
-import { PRACTICE_PILLARS, SERVICES } from '@/data/services';
+import { PRACTICE_PILLARS, SERVICES, servicePath } from '@/data/services';
 
 interface PracticeCarouselSectionProps {
   onSelectPillar: (pillarId: string) => void;
-  onOpenService?: (serviceId: string) => void;
 }
 
 export default function PracticeCarouselSection({
   onSelectPillar,
-  onOpenService,
 }: PracticeCarouselSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const isPointerDown = useRef(false);
-  const dragStartX = useRef(0);
+  const dragStart = useRef({ x: 0, y: 0 });
   const hasDragged = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -51,14 +49,14 @@ export default function PracticeCarouselSection({
   // Modern HTML5 Pointer Events Drag & Swipe System
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Only drag on left click (button 0) or touch
-    if (e.button !== 0) return;
+    if (e.button !== 0 || !e.isPrimary) return;
 
     // Do not initiate drag or capture pointer when interacting with buttons, links or form controls
     const control = (e.target as HTMLElement).closest('button, a, input, select, textarea, [role="button"]');
     if (control) return;
 
     isPointerDown.current = true;
-    dragStartX.current = e.clientX;
+    dragStart.current = { x: e.clientX, y: e.clientY };
     hasDragged.current = false;
     setDragOffset(0);
 
@@ -69,20 +67,32 @@ export default function PracticeCarouselSection({
     }
   };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isPointerDown.current) return;
-    const delta = e.clientX - dragStartX.current;
+  const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.isPrimary) return;
+    isPointerDown.current = false;
+    setDragOffset(0);
+  };
 
-    if (Math.abs(delta) > 8) {
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isPointerDown.current || !e.isPrimary) return;
+    const deltaX = e.clientX - dragStart.current.x;
+    const deltaY = e.clientY - dragStart.current.y;
+
+    if (!hasDragged.current) {
+      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) <= 8) return;
       hasDragged.current = true;
+      if (Math.abs(deltaY) >= Math.abs(deltaX)) {
+        handlePointerCancel(e);
+        return;
+      }
     }
 
     // Dampen drag displacement for realistic physical resistance
-    setDragOffset(delta * 0.7);
+    setDragOffset(deltaX * 0.7);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isPointerDown.current) return;
+    if (!isPointerDown.current || !e.isPrimary) return;
     isPointerDown.current = false;
 
     try {
@@ -93,14 +103,13 @@ export default function PracticeCarouselSection({
       // ignore
     }
 
-    const delta = e.clientX - dragStartX.current;
+    const deltaX = e.clientX - dragStart.current.x;
+    const deltaY = e.clientY - dragStart.current.y;
     setDragOffset(0);
 
-    // If moved more than 40px, slide to next or previous
-    if (delta < -40) {
-      handleNext();
-    } else if (delta > 40) {
-      handlePrev();
+    if (hasDragged.current && Math.abs(deltaX) > Math.max(40, Math.abs(deltaY))) {
+      if (deltaX < 0) handleNext();
+      else handlePrev();
     }
 
     // Reset drag flag after microtask to allow click filtering
@@ -121,14 +130,14 @@ export default function PracticeCarouselSection({
       id="areas-practica"
       ref={containerRef}
       tabIndex={0}
-      className="relative min-h-screen w-full bg-[#081225] text-primary-light py-28 px-6 md:px-12 flex flex-col justify-between overflow-hidden border-b border-accent-ice/10 focus:outline-none select-none"
+      className="relative w-full bg-[#081225] text-primary-light py-14 px-6 md:min-h-screen md:py-28 md:px-12 flex flex-col justify-between overflow-hidden border-b border-accent-ice/10 focus:outline-none select-none"
       aria-label="Carrusel de Áreas de Práctica"
     >
       {/* Background ambient accents */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-secondary-dark/40 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Section Header */}
-      <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+      <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16">
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-mono text-accent-gold uppercase tracking-widest mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-gold" />
@@ -174,9 +183,9 @@ export default function PracticeCarouselSection({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
       >
-        <div className="relative w-full min-h-[480px] md:min-h-[520px] flex items-center justify-center">
+        <div className="relative grid w-full items-start justify-items-center max-md:overflow-clip md:min-h-[520px] md:items-center">
           {PRACTICE_PILLARS.map((pillar, index) => {
             // Calculate relative offset from active card
             let offset = index - activeIndex;
@@ -189,47 +198,40 @@ export default function PracticeCarouselSection({
             const isHidden = Math.abs(offset) > 1;
 
             let transform = 'translate3d(0, 0, -200px) scale(0.7) rotateY(0deg)';
-            let opacity = 0;
             let zIndex = 0;
-            let pointerEvents: 'auto' | 'none' = 'none';
 
             if (isActive) {
               const liveX = dragOffset;
               const liveRot = dragOffset * 0.04;
               transform = `translate3d(${liveX}px, 0, 0) scale(1) rotateY(${liveRot}deg)`;
-              opacity = 1;
               zIndex = 30;
-              pointerEvents = 'auto';
             } else if (isLeft) {
               const liveX = -55 + (dragOffset / 20);
               transform = `translate3d(${liveX}%, 0, -140px) scale(0.85) rotateY(24deg)`;
-              opacity = 0.45;
               zIndex = 10;
-              pointerEvents = 'auto';
             } else if (isRight) {
               const liveX = 55 + (dragOffset / 20);
               transform = `translate3d(${liveX}%, 0, -140px) scale(0.85) rotateY(-24deg)`;
-              opacity = 0.45;
               zIndex = 10;
-              pointerEvents = 'auto';
             }
 
             return (
               <div
                 key={pillar.id}
                 onClick={() => handleCardClick(index)}
-                className={`absolute w-full max-w-3xl rounded-2xl bg-secondary-dark/95 border transition-all duration-500 ease-out shadow-luxury preserve-3d overflow-hidden ${
+                className={`col-start-1 row-start-1 w-full max-w-3xl rounded-2xl bg-secondary-dark/95 border shadow-luxury preserve-3d overflow-hidden motion-reduce:!transition-none ${
                   isActive
-                    ? 'border-accent-ice/30 shadow-glow-ice'
-                    : 'border-accent-ice/10 hover:border-accent-ice/20 cursor-pointer'
+                    ? 'relative border-accent-ice/30 shadow-glow-ice'
+                    : 'absolute max-md:inset-x-0 max-md:top-0 md:relative invisible pointer-events-none opacity-0 border-accent-ice/10 hover:border-accent-ice/20 cursor-pointer'
+                } ${
+                  !isActive && !isHidden ? 'md:visible md:pointer-events-auto md:opacity-[0.45]' : ''
                 }`}
                 style={{
                   transform,
-                  opacity,
                   zIndex,
-                  pointerEvents,
-                  visibility: isHidden ? 'hidden' : 'visible',
-                  transition: isPointerDown.current && isActive ? 'none' : 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transition: isPointerDown.current && isActive
+                    ? 'none'
+                    : 'transform 600ms cubic-bezier(0.16, 1, 0.3, 1), opacity 600ms ease-out, visibility 600ms',
                 }}
               >
                 {/* Background watermark number */}
@@ -237,7 +239,7 @@ export default function PracticeCarouselSection({
                   {pillar.number}
                 </div>
 
-                <div className="p-8 md:p-12 relative z-10 flex flex-col justify-between h-full">
+                <div className="p-6 md:p-12 relative z-10 flex flex-col justify-between h-full">
                   <div>
                     {/* Header line of card */}
                     <div className="flex items-center justify-between border-b border-accent-ice/10 pb-5 mb-6">
@@ -272,12 +274,14 @@ export default function PracticeCarouselSection({
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {SERVICES.filter((s) => pillar.serviceIds.includes(s.id)).map((s) => (
-                          <span
+                          <a
                             key={s.id}
+                            href={servicePath(s)}
+                            onClick={(event) => event.stopPropagation()}
                             className="px-3 py-1.5 rounded-md bg-primary-dark/80 border border-accent-ice/15 text-xs font-sans text-accent-ice/85 select-none"
                           >
                             {s.title}
-                          </span>
+                          </a>
                         ))}
                       </div>
                     </div>
@@ -310,7 +314,7 @@ export default function PracticeCarouselSection({
       </div>
 
       {/* Bottom Pillars Indicator Pills */}
-      <div className="max-w-7xl mx-auto w-full relative z-10 pt-10 flex flex-wrap items-center justify-center gap-3">
+      <div className="max-w-7xl mx-auto w-full relative z-10 pt-6 md:pt-10 flex flex-wrap items-center justify-center gap-3">
         {PRACTICE_PILLARS.map((p, i) => (
           <button
             key={p.id}

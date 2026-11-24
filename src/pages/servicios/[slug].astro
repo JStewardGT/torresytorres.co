@@ -1,0 +1,96 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import { CONTACT_INFO, SERVICES, servicePath, type ServiceItem } from '@/data/services';
+
+export const getStaticPaths = (() => SERVICES.map((service) => ({
+  params: { slug: service.slug },
+  props: { service },
+}))) satisfies GetStaticPaths;
+
+const { service } = Astro.props as { service: ServiceItem };
+const title = `${service.title} en Bogotá | Torres & Torres`;
+const related = SERVICES.filter((item) => item.id !== service.id && item.pillarId === service.pillarId);
+
+const preparation: Record<string, string> = {
+  'derecho-de-sociedades': 'Para consultar por un conflicto entre socios, reúna los estatutos, los acuerdos entre accionistas, las actas pertinentes y las comunicaciones sobre el desacuerdo. Anote qué decisión se discute y en qué fecha se tomó.',
+  'derecho-empresarial': 'Reúna el contrato o borrador, sus anexos y los correos donde se negociaron las condiciones. Identifique las obligaciones que le preocupan y la fecha prevista de firma o renovación.',
+  'consultoria-empresarial': 'Prepare una descripción de la operación, su estructura societaria y las decisiones que necesita tomar la gerencia. Si cuenta con una matriz de riesgos o auditorías anteriores, identifique los hallazgos pendientes.',
+  'gestion-de-proyectos': 'Reúna el contrato principal, el cronograma, los cambios de alcance y las actas de avance. Señale los hitos en riesgo y las decisiones que requieren definición.',
+  'derecho-del-consumidor': 'Tenga a mano el comprobante de compra, las condiciones de garantía y el historial de reclamaciones. Si recibió una notificación, indique la fecha de recepción y el plazo que figura en ella.',
+  'derecho-de-danos-personales': 'Prepare una cronología del incidente e identifique los informes, pólizas y soportes de gastos disponibles. Consulte por un canal seguro antes de compartir documentos médicos.',
+  'derecho-de-sucesiones': 'Si los tiene, identifique el registro de defunción, los documentos de parentesco, un inventario preliminar de bienes y deudas y cualquier testamento. Indique si existe un trámite abierto.',
+  'derecho-de-propiedad': 'Reúna el certificado de tradición y libertad, las escrituras disponibles y las promesas o contratos sobre el inmueble. Identifique el número de matrícula inmobiliaria y el problema que desea resolver.',
+  'derecho-laboral': 'Organice el contrato de trabajo, sus modificaciones, las comunicaciones pertinentes y los soportes de nómina que correspondan. Prepare una cronología con las decisiones o reclamaciones que deben revisarse.',
+  'consultoria-legal': 'Describa la pregunta concreta, la decisión que depende de ella y la fecha en que necesita resolverla. Identifique los contratos, comunicaciones o normas que ya consultó.',
+};
+const documents = preparation[service.slug];
+const contactPath = `/?servicio=${encodeURIComponent(service.slug)}#contacto`;
+---
+
+<Layout title={title} description={service.shortDescription} service={service}>
+  <header class="border-b border-accent-ice/15">
+    <div class="mx-auto max-w-5xl px-6 py-5">
+      <a href="/" class="font-display text-xl text-accent-gold">{CONTACT_INFO.firmName}</a>
+    </div>
+  </header>
+  <main class="mx-auto max-w-5xl px-6 py-10 md:py-16">
+    <nav aria-label="Ruta de navegación" class="mb-8 text-sm text-accent-ice/75">
+      <ol class="flex flex-wrap gap-x-3 gap-y-1">
+        <li><a class="hover:underline" href="/">Inicio</a></li>
+        <li><span aria-hidden="true">/ </span><a class="hover:underline" href="/#catalogo-servicios">Servicios jurídicos</a></li>
+        <li><span aria-hidden="true">/ </span><a aria-current="page" href={servicePath(service)}>{service.title}</a></li>
+      </ol>
+    </nav>
+    <article>
+      <p class="mb-3 text-xs uppercase tracking-widest text-accent-gold">{service.pillarTitle}</p>
+      <h1 class="mb-5 font-display text-4xl font-light md:text-6xl">{service.title} en Bogotá</h1>
+      <p class="mb-8 max-w-3xl text-lg leading-relaxed text-accent-ice/85">{service.shortDescription}</p>
+      <div class="grid gap-10 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div class="space-y-8 text-accent-ice/85">
+          <section>
+            <h2 class="mb-2 font-display text-3xl text-primary-light">Cómo podemos ayudar</h2>
+            <p>{service.detailedScope}</p>
+            <ul class="mt-4 list-disc space-y-2 pl-5">
+              {service.keyDeliverables.map((item) => <li>{item}</li>)}
+            </ul>
+          </section>
+          <section>
+            <h2 class="mb-2 font-display text-3xl text-primary-light">A quién atendemos</h2>
+            <p>{service.targetAudience}</p>
+          </section>
+          <section>
+            <h2 class="mb-2 font-display text-3xl text-primary-light">Situaciones en las que intervenimos</h2>
+            <ul class="list-disc space-y-2 pl-5">
+              {service.typicalCases.map((item) => <li>{item}</li>)}
+            </ul>
+          </section>
+          <section>
+            <h2 class="mb-2 font-display text-3xl text-primary-light">¿Qué conviene preparar para la primera consulta?</h2>
+            <p>{documents}</p>
+          </section>
+        </div>
+        <aside class="self-start rounded-2xl border border-accent-ice/15 bg-secondary-dark p-6">
+          <h2 class="mb-4 font-display text-2xl">Solicitar una consulta</h2>
+          <p class="text-sm text-accent-ice/80">{CONTACT_INFO.firmName}</p>
+          <address class="mb-5 mt-2 space-y-2 break-words text-sm not-italic text-accent-ice/80">
+            <div>{CONTACT_INFO.address}<br />{CONTACT_INFO.city}</div>
+            <a class="block hover:underline" href={`tel:+${CONTACT_INFO.whatsappRaw}`}>{CONTACT_INFO.mobile}</a>
+            <a class="block hover:underline" href={`mailto:${CONTACT_INFO.email}`}>{CONTACT_INFO.email}</a>
+          </address>
+          <a href={contactPath} class="inline-flex rounded-xl bg-accent-gold px-4 py-3 text-sm font-semibold text-primary-dark hover:bg-accent-ice">
+            Solicitar consulta confidencial
+          </a>
+        </aside>
+      </div>
+    </article>
+    <section class="mt-12 border-t border-accent-ice/15 pt-8">
+      <h2 class="mb-4 font-display text-3xl">Servicios relacionados</h2>
+      <ul class="flex flex-wrap gap-3">
+        {related.map((item) => (
+          <li><a href={servicePath(item)} class="block rounded-lg border border-accent-ice/20 px-4 py-2 text-sm text-accent-ice hover:border-accent-gold">{item.title}</a></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</Layout>

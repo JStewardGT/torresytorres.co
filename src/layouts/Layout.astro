@@ -1,124 +1,99 @@
 ---
 import '../styles/globals.css';
-import { SERVICES, CONTACT_INFO } from '@/data/services';
+import { SERVICES, CONTACT_INFO, servicePath, type ServiceItem } from '@/data/services';
 
 interface Props {
   title?: string;
   description?: string;
+  service?: ServiceItem;
+  noindex?: boolean;
 }
 
 const {
-  title = 'TORRES & TORRES Abogados Asociados | Firma Jurídica Corporativa',
-  description = 'Firma jurídica de alto nivel en Colombia. Especialistas en Derecho Corporativo, Litigios Complejos, Protección Patrimonial y Relaciones Laborales Estratégicas.',
+  title = 'Firma de abogados en Bogotá | Torres & Torres Abogados Asociados',
+  description = 'Firma de abogados en Bogotá D.C. Asesoría en derecho societario, empresarial, laboral, litigios y protección patrimonial. Conozca las áreas de práctica de Torres & Torres.',
+  service,
+  noindex = false,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://torresytorres.co');
+const site = Astro.site!;
+const canonicalURL = new URL(Astro.url.pathname, site);
+const organizationId = new URL('/#organization', site).href;
 
-const keywords = [
-  'TORRES & TORRES Abogados',
-  'Abogados Corporativos Bogotá',
-  'Derecho de Sociedades Colombia',
-  'Derecho Empresarial',
-  'Consultoría Empresarial',
-  'Gestión de Proyectos Legales',
-  'Derecho del Consumidor',
-  'Derecho de Daños Personales',
-  'Derecho de Sucesiones',
-  'Derecho de Propiedad e Inmobiliario',
-  'Derecho Laboral Patronal',
-  'Consultoría Legal Estratégica',
-  'Firma de Abogados Asociados',
-].join(', ');
-
-// Comprehensive JSON-LD Schema for LegalService
-const jsonLd = {
-  '@context': 'https://schema.org',
+const organization = {
   '@type': 'LegalService',
-  '@id': 'https://torresytorres.co/#organization',
+  '@id': organizationId,
   name: CONTACT_INFO.firmName,
   legalName: 'TORRES & TORRES Abogados Asociados S.A.S.',
-  url: 'https://torresytorres.co',
-  description:
-    'Firma jurídica de élite especializada en derecho societario, litigios complejos, estructuración patrimonial y consultoría laboral estratégica.',
-  telephone: CONTACT_INFO.phone,
+  url: site.href,
+  telephone: CONTACT_INFO.mobile,
   email: CONTACT_INFO.email,
   address: {
     '@type': 'PostalAddress',
     streetAddress: CONTACT_INFO.address,
-    addressLocality: 'Bogotá',
-    addressRegion: 'Cundinamarca',
-    postalCode: CONTACT_INFO.postalCode,
+    addressLocality: 'Bogotá D.C.',
     addressCountry: 'CO',
   },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: 4.6784,
-    longitude: -74.0536,
-  },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '08:00',
-      closes: '18:00',
-    },
-  ],
-  priceRange: '$$$$',
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Catálogo Oficial de Servicios Jurídicos',
-    itemListElement: SERVICES.map((service, index) => ({
+    name: 'Servicios jurídicos',
+    itemListElement: SERVICES.map((item) => ({
       '@type': 'Offer',
-      itemOffered: {
-        '@type': 'Service',
-        name: service.title,
-        description: service.shortDescription,
-        serviceType: service.pillarTitle,
-        offers: {
-          '@type': 'Offer',
-          availability: 'https://schema.org/InStock',
-        },
-      },
-      position: index + 1,
+      itemOffered: { '@id': new URL(servicePath(item) + '#service', site).href },
     })),
   },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    organization,
+    ...(service ? [service] : SERVICES).map((item) => ({
+      '@type': 'Service',
+      '@id': new URL(servicePath(item) + '#service', site).href,
+      url: new URL(servicePath(item), site).href,
+      name: item.title,
+      description: item.shortDescription,
+      serviceType: item.pillarTitle,
+      provider: { '@id': organizationId },
+    })),
+  ],
 };
 ---
 
 <!doctype html>
-<html lang="es" class="scroll-smooth antialiased">
+<html lang="es-CO" class="scroll-smooth antialiased">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="theme-color" content="#081225" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="keywords" content={keywords} />
     <meta name="author" content="TORRES & TORRES Abogados Asociados" />
     <meta name="creator" content="TORRES & TORRES Abogados Asociados" />
     <meta name="publisher" content="TORRES & TORRES Abogados Asociados" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large"} />
+    {!noindex && <link rel="canonical" href={canonicalURL} />}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://torresytorres.co" />
-    <meta property="og:title" content="TORRES & TORRES Abogados Asociados | Rigor Jurídico & Visión Estratégica" />
-    <meta property="og:description" content="Soluciones jurídicas de vanguardia para la alta dirección corporativa, transacciones complejas, controversias de alto calibre y perpetuación patrimonial." />
+    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
     <meta property="og:site_name" content="TORRES & TORRES Abogados Asociados" />
     <meta property="og:locale" content="es_CO" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TORRES & TORRES Abogados Asociados" />
-    <meta name="twitter:description" content="Rigor técnico, defensa inquebrantable y estrategia corporativa en Colombia." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
 
     <!-- Fonts preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!-- Structured Data JSON-LD -->
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
 
     <!-- Google Analytics (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y64B1HGD7H"></script>

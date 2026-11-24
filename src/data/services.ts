@@ -347,11 +347,13 @@ export const SERVICES: ServiceItem[] = [
   },
 ];
 
+export function servicePath(service: Pick<ServiceItem, 'slug'>) {
+  return `/servicios/${service.slug}/`;
+}
+
 export const FIRM_STATS = [
-  { value: '5+', label: 'Años de Trayectoria Combinada', suffix: 'Años' },
-  { value: '98.4%', label: 'Índice de Resolución Favorable', suffix: 'Eficacia' },
-  { value: '1.200+', label: 'Contratos y Operaciones Blindadas', suffix: 'Casos' },
-  { value: '100%', label: 'Confidencialidad y Rigor Técnico', suffix: 'Compromiso' },
+  { value: SERVICES.length, label: 'Servicios jurídicos' },
+  { value: PRACTICE_PILLARS.length, label: 'Áreas de práctica' },
 ];
 
 export const FIRM_METHODOLOGY = [

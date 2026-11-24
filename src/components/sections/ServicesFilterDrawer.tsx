@@ -14,18 +14,16 @@ import {
   ChevronRight,
   Shield,
 } from 'lucide-react';
-import { SERVICES, PRACTICE_PILLARS, type ServiceItem } from '@/data/services';
+import { SERVICES, PRACTICE_PILLARS, servicePath, type ServiceItem } from '@/data/services';
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 interface ServicesFilterDrawerProps {
   initialPillarFilter?: string | null;
-  selectedServiceId?: string | null;
   onSelectServiceForContact?: (serviceTitle: string) => void;
 }
 
 export default function ServicesFilterDrawer({
   initialPillarFilter = null,
-  selectedServiceId = null,
   onSelectServiceForContact,
 }: ServicesFilterDrawerProps) {
   const [activePillar, setActivePillar] = useState<string>('todos');
@@ -42,28 +40,7 @@ export default function ServicesFilterDrawer({
     }
   }, [initialPillarFilter]);
 
-  // Sync initial selected service
   useEffect(() => {
-    if (selectedServiceId) {
-      const found = SERVICES.find((s) => s.id === selectedServiceId);
-      if (found) {
-        setActiveServiceDetail(found);
-      }
-    }
-  }, [selectedServiceId]);
-
-  // Listen for direct custom events to open service details or filter by pillar without re-rendering parent tree
-  useEffect(() => {
-    const handleCustomServiceOpen = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      if (customEvent.detail) {
-        const found = SERVICES.find((s) => s.id === customEvent.detail);
-        if (found) {
-          setActiveServiceDetail(found);
-        }
-      }
-    };
-
     const handleCustomPillarSelect = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
       if (customEvent.detail) {
@@ -73,11 +50,9 @@ export default function ServicesFilterDrawer({
       }
     };
 
-    window.addEventListener('torres-open-service', handleCustomServiceOpen);
     window.addEventListener('torres-select-pillar', handleCustomPillarSelect);
 
     return () => {
-      window.removeEventListener('torres-open-service', handleCustomServiceOpen);
       window.removeEventListener('torres-select-pillar', handleCustomPillarSelect);
     };
   }, []);
@@ -229,11 +204,10 @@ export default function ServicesFilterDrawer({
 
       {/* Grid of 10 Services */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredServices.map((service, index) => (
+        {filteredServices.map((service) => (
           <div
             key={service.id}
-            onClick={() => setActiveServiceDetail(service)}
-            className="group relative rounded-2xl bg-secondary-dark/70 hover:bg-secondary-dark border border-accent-ice/10 hover:border-accent-ice/30 p-7 transition-all duration-300 flex flex-col justify-between cursor-pointer shadow-luxury hover:shadow-glow-ice hover:-translate-y-1"
+            className="group relative rounded-2xl bg-secondary-dark/70 hover:bg-secondary-dark border border-accent-ice/10 hover:border-accent-ice/30 p-7 transition-all duration-300 flex flex-col justify-between shadow-luxury hover:shadow-glow-ice hover:-translate-y-1"
           >
             <div>
               {/* Header tags */}
@@ -248,7 +222,7 @@ export default function ServicesFilterDrawer({
 
               {/* Title */}
               <h3 className="font-display text-2xl text-primary-light group-hover:text-accent-ice transition-colors font-light mb-2.5">
-                {service.title}
+                <a href={servicePath(service)} className="hover:underline">{service.title}</a>
               </h3>
 
               {/* Pillar subtitle */}
@@ -274,12 +248,12 @@ export default function ServicesFilterDrawer({
 
             {/* Bottom Actions */}
             <div className="pt-4 border-t border-accent-ice/10 flex items-center justify-between">
-              <span className="text-xs font-sans text-accent-gold font-medium group-hover:underline">
+              <a href={servicePath(service)} className="text-xs font-medium text-accent-gold hover:underline">
                 Ver alcance y casos
-              </span>
-              <div className="w-8 h-8 rounded-full border border-accent-ice/20 flex items-center justify-center text-accent-ice group-hover:border-accent-gold group-hover:text-accent-gold transition-colors">
-                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </div>
+              </a>
+              <button type="button" onClick={() => setActiveServiceDetail(service)} aria-label={`Vista rápida de ${service.title}`} className="w-8 h-8 rounded-full border border-accent-ice/20 flex items-center justify-center text-accent-ice hover:border-accent-gold hover:text-accent-gold transition-colors">
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         ))}
@@ -349,7 +323,7 @@ export default function ServicesFilterDrawer({
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full max-w-3xl rounded-3xl bg-secondary-dark border border-accent-ice/25 p-8 md:p-12 max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div data-lenis-prevent className="relative w-full max-w-3xl rounded-3xl bg-secondary-dark border border-accent-ice/25 p-8 md:p-12 max-h-[90vh] overflow-y-auto overscroll-y-contain shadow-2xl">
             {/* Close Button */}
             <button
               onClick={() => setActiveServiceDetail(null)}

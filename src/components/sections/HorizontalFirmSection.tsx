@@ -129,12 +129,12 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
         >
           <div
             ref={panelsRef}
-            className="flex flex-col md:flex-row items-stretch gap-6 md:gap-8 w-full md:w-max will-change-transform pr-6 md:pr-16"
+            className="flex flex-col md:flex-row items-stretch gap-6 md:gap-8 w-full md:w-max md:min-h-[clamp(360px,50vh,460px)] will-change-transform md:pr-16"
           >
             {FIRM_METHODOLOGY.map((method, idx) => (
               <div
                 key={idx}
-                className="firm-card w-full md:w-[460px] lg:w-[500px] h-auto md:h-[50vh] md:max-h-[460px] md:min-h-[360px] shrink-0 rounded-3xl bg-[#F4F4F2] border border-[#081225]/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-[#081225]/30 transition-all duration-300"
+                className="firm-card w-full md:w-[460px] lg:w-[500px] shrink-0 rounded-3xl bg-[#F4F4F2] border border-[#081225]/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-[#081225]/30 transition-all duration-300"
               >
                 {/* Giant background step number */}
                 <div className="absolute top-2 right-6 font-display text-8xl md:text-9xl font-bold text-[#081225]/[0.04] select-none pointer-events-none">
@@ -188,7 +188,7 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
             ))}
 
             {/* Additional Institutional Callout Panel */}
-            <div className="firm-card w-full md:w-[420px] h-auto md:h-[52vh] md:max-h-[480px] md:min-h-[380px] shrink-0 rounded-3xl bg-[#081225] text-primary-light p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+            <div className="firm-card w-full md:w-[420px] shrink-0 rounded-3xl bg-[#081225] text-primary-light p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-2xl relative overflow-hidden">
               <div>
                 <span className="text-[11px] font-mono text-accent-gold uppercase tracking-widest block mb-2">
                   / Compromiso Institucional

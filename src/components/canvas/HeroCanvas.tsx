@@ -8,9 +8,11 @@ function ArchitecturalStructure() {
   const meshRef = useRef<THREE.Group>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const particlesRef = useRef<THREE.Points>(null);
-  const { invalidate } = useThree();
+  const { gl, invalidate, size } = useThree();
+  const compact = size.width < 768;
+  const spin = useRef(false);
 
-  const mouse = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const parallax = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
 
   // Generate delicate ambient particles
   const particleCount = 120;
@@ -25,49 +27,79 @@ function ArchitecturalStructure() {
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (compact) {
+      let visible = false;
+      const updateSpin = () => {
+        spin.current = visible && !reducedMotion.matches;
+        if (spin.current) invalidate();
+      };
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        updateSpin();
+      });
+      observer.observe(gl.domElement);
+      reducedMotion.addEventListener('change', updateSpin);
+
+      return () => {
+        observer.disconnect();
+        reducedMotion.removeEventListener('change', updateSpin);
+        spin.current = false;
+      };
+    }
+
+    const updatePointer = (e: PointerEvent) => {
+      if (reducedMotion.matches || !e.isPrimary || e.pointerType === 'touch') return;
+
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -(e.clientY / window.innerHeight) * 2 + 1;
-      mouse.current.targetX = x * 0.35;
-      mouse.current.targetY = y * 0.25;
+      parallax.current.targetX = x * 0.35;
+      parallax.current.targetY = y * 0.25;
       invalidate();
     };
 
     const handleScroll = () => {
-      if (meshRef.current) {
-        meshRef.current.position.y = -window.scrollY * 0.0015;
-      }
+      if (reducedMotion.matches || !meshRef.current) return;
+      meshRef.current.position.y = -0.2 - window.scrollY * 0.0015;
       invalidate();
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('pointermove', updatePointer, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Initial render
     invalidate();
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('pointermove', updatePointer);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [invalidate]);
+  }, [compact, gl, invalidate]);
 
-  useFrame((state, delta) => {
-    // Smooth dampening towards target mouse coordinates
-    const dx = mouse.current.targetX - mouse.current.x;
-    const dy = mouse.current.targetY - mouse.current.y;
+  useFrame((_, delta) => {
+    if (compact) {
+      if (spin.current && meshRef.current) {
+        meshRef.current.rotation.y = (meshRef.current.rotation.y + Math.min(delta, 0.05) * Math.PI * 2 / 60) % (Math.PI * 2);
+        invalidate();
+      }
+      return;
+    }
+
+    const pointer = parallax.current;
+    const dx = pointer.targetX - pointer.x;
+    const dy = pointer.targetY - pointer.y;
 
     if (Math.abs(dx) > 0.0005 || Math.abs(dy) > 0.0005) {
-      mouse.current.x += dx * 0.05;
-      mouse.current.y += dy * 0.05;
+      pointer.x += dx * 0.08;
+      pointer.y += dy * 0.08;
 
       if (meshRef.current) {
-        meshRef.current.rotation.y = mouse.current.x * 0.8 + state.clock.elapsedTime * 0.03;
-        meshRef.current.rotation.x = -mouse.current.y * 0.5;
+        meshRef.current.rotation.y = pointer.x * 0.8;
+        meshRef.current.rotation.x = -pointer.y * 0.5;
       }
 
       if (ringRef.current) {
-        ringRef.current.rotation.z = state.clock.elapsedTime * 0.02;
+        ringRef.current.rotation.z = pointer.x * 0.45;
       }
 
       invalidate();
@@ -75,7 +107,7 @@ function ArchitecturalStructure() {
   });
 
   return (
-    <group ref={meshRef} position={[2.8, -0.2, -1]}>
+    <group ref={meshRef} position={[compact ? 1.45 : 2.8, -0.2, -1]} scale={compact ? 0.62 : 1}>
       {/* Primary Architectural Wireframe Column / Monolith */}
       <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[1.4, 1.8, 5.2, 8, 4, true]} />
@@ -144,7 +176,7 @@ function ArchitecturalStructure() {
 
 export default function HeroCanvas() {
   return (
-    <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden">
+    <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden max-md:opacity-[0.55]" aria-hidden="true">
       <Canvas
         frameloop="demand"
         dpr={[1, 1.5]}

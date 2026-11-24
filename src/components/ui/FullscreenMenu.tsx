@@ -3,19 +3,17 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { X, ArrowUpRight, Scale, Shield, Phone, Mail, MapPin } from 'lucide-react';
-import { PRACTICE_PILLARS, SERVICES, CONTACT_INFO } from '@/data/services';
+import { PRACTICE_PILLARS, SERVICES, CONTACT_INFO, servicePath } from '@/data/services';
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 interface FullscreenMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenService: (serviceId: string) => void;
 }
 
 export default function FullscreenMenu({
   isOpen,
   onClose,
-  onOpenService,
 }: FullscreenMenuProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -80,17 +78,11 @@ export default function FullscreenMenu({
     }, 400);
   };
 
-  const handleSelectService = (serviceId: string) => {
-    onClose();
-    setTimeout(() => {
-      onOpenService(serviceId);
-    }, 350);
-  };
-
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-[#081225]/95 backdrop-blur-2xl opacity-0 invisible flex flex-col justify-between overflow-y-auto"
+      className="fixed inset-0 z-50 bg-[#081225]/95 backdrop-blur-2xl opacity-0 invisible flex flex-col justify-between overflow-y-auto overscroll-y-contain"
+      data-lenis-prevent
       role="dialog"
       aria-modal="true"
       aria-label="Menú principal de navegación"
@@ -223,9 +215,9 @@ export default function FullscreenMenu({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {SERVICES.map((s, idx) => (
-                <button
+                <a
                   key={s.id}
-                  onClick={() => handleSelectService(s.id)}
+                  href={servicePath(s)}
                   className="menu-stagger-item flex items-center justify-between p-3 rounded-md bg-primary-dark/80 hover:bg-accent-ice/10 border border-accent-ice/10 hover:border-accent-ice/40 text-left transition-all duration-200 group"
                 >
                   <div className="flex items-center space-x-3 truncate">
@@ -237,7 +229,7 @@ export default function FullscreenMenu({
                     </span>
                   </div>
                   <ArrowUpRight className="w-3.5 h-3.5 text-accent-ice/30 group-hover:text-accent-gold group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 ml-2" />
-                </button>
+                </a>
               ))}
             </div>
           </div>

@@ -15,10 +15,15 @@ import {
   AlertTriangle,
   RotateCcw,
 } from 'lucide-react';
-import { CONTACT_INFO, SERVICES } from '@/data/services';
+import { CONTACT_INFO, SERVICES, servicePath } from '@/data/services';
 import CustomSelect from '@/components/ui/CustomSelect';
 
 const DEFAULT_ENDPOINT = 'https://torres-contact-api.johans-galeanot.workers.dev';
+
+function getOriginService() {
+  const slug = new URLSearchParams(window.location.search).get('servicio');
+  return SERVICES.find((service) => service.slug === slug);
+}
 
 interface ContactSectionProps {
   preselectedService?: string;
@@ -39,9 +44,8 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    if (preselectedService) {
-      setSelectedService(preselectedService);
-    }
+    const service = preselectedService ?? getOriginService()?.title;
+    if (service) setSelectedService(service);
   }, [preselectedService]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,6 +85,13 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
 
       if (response.ok && result.success !== false) {
         setStatus('success');
+        const origin = getOriginService();
+        const analytics = window as Window & {
+          gtag?: (command: 'event', name: string, parameters: Record<string, string>) => void;
+        };
+        analytics.gtag?.('event', 'generate_lead', {
+          lead_source_path: origin ? servicePath(origin) : '/',
+        });
       } else {
         const errorMsg =
           typeof result.error === 'string'
@@ -438,17 +449,17 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="w-full py-4 rounded-xl bg-accent-gold text-primary-dark font-sans text-xs uppercase tracking-widest font-semibold hover:bg-accent-ice transition-all duration-300 flex items-center justify-center space-x-2 shadow-glow-gold disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full px-4 py-4 rounded-xl bg-accent-gold text-primary-dark font-sans text-xs uppercase tracking-widest font-semibold hover:bg-accent-ice transition-all duration-300 flex items-center justify-center gap-2 shadow-glow-gold disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {status === 'loading' ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin text-primary-dark" />
-                      <span>Transmitiendo Requerimiento Cifrado...</span>
+                      <Loader2 aria-hidden="true" className="w-4 h-4 shrink-0 animate-spin text-primary-dark" />
+                      <span className="text-balance">Transmitiendo Requerimiento Cifrado...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
-                      <span>Enviar Requerimiento Confidencial</span>
+                      <Send aria-hidden="true" className="w-4 h-4 shrink-0" />
+                      <span className="text-balance">Enviar Requerimiento Confidencial</span>
                     </>
                   )}
                 </button>

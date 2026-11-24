@@ -102,13 +102,13 @@ export default function Header({ onOpenMenu, onOpenConsultation }: HeaderProps) 
           {/* Menu Trigger Button */}
           <button
             onClick={onOpenMenu}
-            className="flex items-center space-x-2 px-3.5 py-2 rounded-full border border-accent-ice/20 hover:border-accent-ice/60 bg-secondary-dark/60 text-accent-ice hover:bg-secondary-dark transition-all duration-300 group focus:outline-none"
+            className="flex items-center justify-center gap-2 min-w-[54px] px-3.5 py-2 rounded-full border border-accent-ice/20 hover:border-accent-ice/60 bg-secondary-dark/60 text-accent-ice hover:bg-secondary-dark transition-all duration-300 group focus:outline-none"
             aria-label="Abrir menú de navegación"
           >
             <span className="text-xs uppercase tracking-widest font-sans font-medium hidden md:inline">
               Menú
             </span>
-            <Menu className="w-4 h-4 transition-transform group-hover:scale-110" />
+            <Menu aria-hidden="true" className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
           </button>
         </div>
       </div>

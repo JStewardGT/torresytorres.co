@@ -115,3 +115,13 @@ PUBLIC_CONTACT_ENDPOINT=https://torres-contact-api.johans-galeanot.workers.dev
 ```
 
 *(También se mantiene compatibilidad retrospectiva con `NEXT_PUBLIC_CONTACT_ENDPOINT`).*
+
+## Publicación y seguimiento SEO
+
+Astro genera las fichas `/servicios/<slug>/`, `/robots.txt` y `/sitemap.xml` a partir del catálogo y del dominio configurado en `astro.config.mjs`.
+
+1. Identificar en Cloudflare el proyecto u origen que sirve `torresytorres.co` y publicar el resultado de `npm run build` desde `dist/`. Configurar el alias `www` con una redirección permanente que preserve la ruta y la consulta.
+2. Confirmar que la portada, las fichas, el sitemap y robots responden `200`; una ruta desconocida debe devolver `404`. Si Cloudflare administra robots.txt, comprobar que la respuesta pública conserva el sitemap y el acceso de los rastreadores de búsqueda. Revisar Googlebot mediante Inspección de URL y los demás rastreadores identificados en los registros del CDN. Cualquier política para rastreadores de entrenamiento se decide por separado.
+3. Enviar `https://torresytorres.co/sitemap.xml` en Google Search Console y Bing Webmaster Tools. Revisar las canónicas y medir el rendimiento móvil de la portada con WebGL activo. Comprobar en GA4 que un envío real de consulta emite `generate_lead`. Registrar `lead_source_path` como dimensión de evento para distinguir la portada de la ficha de origen.
+4. Validar con la firma la dirección, el teléfono y los horarios antes de sincronizarlos con el Perfil de Empresa de Google. Incorporar las fichas de abogados, sus credenciales, sus especialidades y las fechas de revisión cuando la firma confirme esos datos.
+5. A los 30, 60 y 90 días, registrar páginas indexadas, impresiones, clics y consultas recibidas por página de entrada. Comparar búsquedas de marca con búsquedas por problema y ciudad. Repetir mensualmente en asistentes con búsqueda web las mismas preguntas y registrar fecha, asistente, firma mencionada, URL citada y exactitud de los datos. Usar como consultas iniciales «¿Qué firma en Bogotá asesora en conflictos entre socios?», «¿Qué abogados en Bogotá asesoran a empresas en defensa del consumidor?», «¿Qué firma en Bogotá asesora en sucesiones familiares?» y «¿Qué abogados en Bogotá asesoran a empleadores en asuntos laborales?».

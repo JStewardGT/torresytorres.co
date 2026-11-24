@@ -2,15 +2,14 @@
 
 import React from 'react';
 import { ArrowUp, ArrowUpRight, Scale, Shield } from 'lucide-react';
-import { PRACTICE_PILLARS, SERVICES, CONTACT_INFO } from '@/data/services';
+import { PRACTICE_PILLARS, SERVICES, CONTACT_INFO, servicePath } from '@/data/services';
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 interface FooterProps {
-  onOpenService: (serviceId: string) => void;
   onOpenPillar: (pillarId: string) => void;
 }
 
-export default function Footer({ onOpenService, onOpenPillar }: FooterProps) {
+export default function Footer({ onOpenPillar }: FooterProps) {
   const { scrollTo } = useSmoothScroll();
 
   return (
@@ -80,13 +79,12 @@ export default function Footer({ onOpenService, onOpenPillar }: FooterProps) {
               <ul className="space-y-2.5">
                 {SERVICES.slice(0, 6).map((s) => (
                   <li key={s.id}>
-                    <button
-                      onClick={() => onOpenService(s.id)}
+                    <a href={servicePath(s)}
                       className="text-accent-ice/70 hover:text-accent-ice text-left transition-colors flex items-center space-x-1 group"
                     >
                       <span className="line-clamp-1">{s.title}</span>
                       <ArrowUpRight className="w-3 h-3 text-accent-ice/30 group-hover:text-accent-gold opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -100,13 +98,12 @@ export default function Footer({ onOpenService, onOpenPillar }: FooterProps) {
               <ul className="space-y-2.5">
                 {SERVICES.slice(6).map((s) => (
                   <li key={s.id}>
-                    <button
-                      onClick={() => onOpenService(s.id)}
+                    <a href={servicePath(s)}
                       className="text-accent-ice/70 hover:text-accent-ice text-left transition-colors flex items-center space-x-1 group"
                     >
                       <span className="line-clamp-1">{s.title}</span>
                       <ArrowUpRight className="w-3 h-3 text-accent-ice/30 group-hover:text-accent-gold opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>

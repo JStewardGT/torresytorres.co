@@ -12,24 +12,14 @@ import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activePillarFilter, setActivePillarFilter] = useState<string | null>(null);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [preselectedContactService, setPreselectedContactService] = useState<string | undefined>(undefined);
 
   const { scrollTo } = useSmoothScroll();
 
   const handleOpenPillarInCatalog = (pillarId: string) => {
     setActivePillarFilter(pillarId);
-    setSelectedServiceId(null);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('torres-select-pillar', { detail: pillarId }));
-    }
-    scrollTo('#catalogo-servicios');
-  };
-
-  const handleOpenSpecificService = (serviceId: string) => {
-    setSelectedServiceId(serviceId);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('torres-open-service', { detail: serviceId }));
     }
     scrollTo('#catalogo-servicios');
   };
@@ -48,10 +38,6 @@ export default function HomePage() {
       <FullscreenMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        onOpenService={(serviceId) => {
-          setIsMenuOpen(false);
-          handleOpenSpecificService(serviceId);
-        }}
       />
 
       {/* Persistent Minimalist Top Navigation Header */}
@@ -68,13 +54,11 @@ export default function HomePage() {
       {/* 2. Practice Carousel Section (3D Perspective Spatial Carousel of 4 Pillars) */}
       <PracticeCarouselSection
         onSelectPillar={handleOpenPillarInCatalog}
-        onOpenService={handleOpenSpecificService}
       />
 
       {/* 3. Immersive Filter Panel & 10 Services Interactive Catalog */}
       <ServicesFilterDrawer
         initialPillarFilter={activePillarFilter}
-        selectedServiceId={selectedServiceId}
         onSelectServiceForContact={handleSelectServiceForContact}
       />
 
@@ -90,7 +74,6 @@ export default function HomePage() {
 
       {/* 6. Editorial Footer */}
       <Footer
-        onOpenService={handleOpenSpecificService}
         onOpenPillar={handleOpenPillarInCatalog}
       />
     </main>

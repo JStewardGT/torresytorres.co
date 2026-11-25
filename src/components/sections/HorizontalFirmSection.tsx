@@ -136,11 +136,6 @@ export default function HorizontalFirmSection({ onOpenConsultation }: Horizontal
                 key={idx}
                 className="firm-card w-full md:w-[460px] lg:w-[500px] shrink-0 rounded-3xl bg-[#F4F4F2] border border-[#081225]/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between shadow-lg relative overflow-hidden group hover:border-[#081225]/30 transition-all duration-300"
               >
-                {/* Giant background step number */}
-                <div className="absolute top-2 right-6 font-display text-8xl md:text-9xl font-bold text-[#081225]/[0.04] select-none pointer-events-none">
-                  {method.step}
-                </div>
-
                 <div>
                   {/* Header of panel */}
                   <div className="flex items-center justify-between border-b border-[#081225]/10 pb-3 mb-4">

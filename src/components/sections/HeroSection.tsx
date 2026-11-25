@@ -20,7 +20,7 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
     () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      // Line by line reveal with clip-path and gentle translation
+      // Keep the headline visible while the supporting content animates.
       const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.1 } });
 
       tl.fromTo(
@@ -28,18 +28,6 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.8, delay: 0.2 }
       )
-        .fromTo(
-          '.hero-reveal-line',
-          { y: 60, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            stagger: 0.15,
-            duration: 1.1,
-            clearProps: 'all',
-          },
-          '-=0.4'
-        )
         .fromTo(
           '.hero-subtext',
           { opacity: 0, y: 25 },
@@ -87,12 +75,12 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
         {/* Monumental Headline with line-by-line reveal */}
         <h1 className="font-display text-[clamp(1.7rem,9vw,3.75rem)] md:text-7xl lg:text-8xl font-light tracking-tight text-primary-light leading-[1.04] md:leading-[1.18] space-y-1 md:space-y-3 mb-5 md:mb-8">
           <span className="block overflow-hidden pb-1 -mb-1 md:pb-6 md:-mb-6">
-            <span className="hero-reveal-line block md:pb-2">
+            <span className="block md:pb-2">
               Rigor técnico,
             </span>
           </span>
           <span className="block overflow-hidden pb-1 -mb-1 md:pb-6 md:-mb-6">
-            <span className="hero-reveal-line block md:pb-2">
+            <span className="block md:pb-2">
               defensa{' '}
               <span className="italic font-normal text-accent-gold md:ml-2">
                 inquebrantable
@@ -100,7 +88,7 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
             </span>
           </span>
           <span className="block overflow-hidden pb-1 -mb-1 md:pb-6 md:-mb-6">
-            <span className="hero-reveal-line block text-accent-ice md:pb-2">
+            <span className="block text-accent-ice md:pb-2">
               &amp; estrategia corporativa.
             </span>
           </span>

@@ -172,7 +172,7 @@ export default function ContactSection({ preselectedService }: ContactSectionPro
                   <div>
                     <strong className="block text-primary-light font-medium">Dirección Corporativa:</strong>
                     <span>{CONTACT_INFO.address}</span>
-                    <span className="block text-accent-ice/50 font-mono text-xs">{CONTACT_INFO.city} — CP {CONTACT_INFO.postalCode}</span>
+                    <span className="block text-accent-ice/70 font-mono text-xs">{CONTACT_INFO.city} — CP {CONTACT_INFO.postalCode}</span>
                   </div>
                 </div>
 

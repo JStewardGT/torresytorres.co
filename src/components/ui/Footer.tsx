@@ -44,7 +44,7 @@ export default function Footer({ onOpenPillar }: FooterProps) {
               <p className="text-primary-light font-sans font-medium">{CONTACT_INFO.address}</p>
               <p>{CONTACT_INFO.city}</p>
               <p>Teléfono Fijo: <a href="tel:+5717156975" className="hover:text-accent-gold transition-colors">{CONTACT_INFO.phone}</a></p>
-              <p>Celular / WhatsApp: <a href="https://wa.me/573222915599" target="_blank" rel="noopener noreferrer" className="text-accent-gold hover:underline">{CONTACT_INFO.mobile}</a></p>
+              <p>Celular / WhatsApp: <a href="https://wa.me/573222915599" target="_blank" rel="noopener noreferrer" className="text-accent-gold underline underline-offset-2">{CONTACT_INFO.mobile}</a></p>
               <p>Email: <a href={`mailto:${CONTACT_INFO.email}`} target="_blank" className="hover:text-accent-ice transition-colors">{CONTACT_INFO.email}</a></p>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function Footer({ onOpenPillar }: FooterProps) {
                       onClick={() => onOpenPillar(p.id)}
                       className="text-accent-ice/70 hover:text-accent-gold text-left transition-colors flex items-center space-x-1.5"
                     >
-                      <span className="font-mono text-accent-gold/60 text-[10px]">{p.number}.</span>
+                      <span className="font-mono text-accent-gold/85 text-[10px]">{p.number}.</span>
                       <span className="line-clamp-1">{p.title}</span>
                     </button>
                   </li>
@@ -112,7 +112,7 @@ export default function Footer({ onOpenPillar }: FooterProps) {
         </div>
 
         {/* Lower Legal Disclaimers & Copyright */}
-        <div className="pt-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-[11px] font-sans text-accent-ice/50">
+        <div className="pt-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-[11px] font-sans text-accent-ice/70">
           <div className="max-w-2xl leading-relaxed">
             <p>
               Aviso Legal: La información expuesta en este sitio web tiene propósitos exclusivamente informativos e institucionales y no constituye consulta, dictamen ni relación formal abogado-cliente. Para asesoramiento profesional formal, solicite una consulta confidencial directa con nuestros socios.
@@ -129,7 +129,7 @@ export default function Footer({ onOpenPillar }: FooterProps) {
         </div>
 
         {/* Bottom Credits */}
-        <div className="pt-8 mt-6 border-t border-accent-ice/5 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-accent-ice/40">
+        <div className="pt-8 mt-6 border-t border-accent-ice/5 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-accent-ice/70">
           <span>© {new Date().getFullYear()} TORRES &amp; TORRES Abogados Asociados S.A.S. — Todos los derechos reservados.</span>
           <span className="mt-2 sm:mt-0">Diseñado con inspiración en la arquitectura editorial europea de alto nivel.</span>
         </div>

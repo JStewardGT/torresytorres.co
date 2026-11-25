@@ -130,7 +130,7 @@ export default function ServicesFilterDrawer({
 
           {/* Approach Filter: Ambos vs Preventivo vs Litigioso */}
           <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-primary-dark/90 border border-accent-ice/15 shrink-0 self-start sm:self-auto">
-            <span className="text-[11px] font-mono text-accent-ice/50 px-2 hidden md:inline">
+            <span className="text-[11px] font-mono text-accent-ice/70 px-2 hidden md:inline">
               Enfoque:
             </span>
             <button
@@ -215,7 +215,7 @@ export default function ServicesFilterDrawer({
                 <span className="text-[10px] font-mono text-accent-gold uppercase tracking-widest px-2.5 py-1 rounded bg-accent-gold/10 border border-accent-gold/30">
                   {service.badge}
                 </span>
-                <span className="text-[11px] font-mono text-accent-ice/40">
+                <span className="text-[11px] font-mono text-accent-ice/70">
                   {service.approach.split(' ')[0]}
                 </span>
               </div>
@@ -226,7 +226,7 @@ export default function ServicesFilterDrawer({
               </h3>
 
               {/* Pillar subtitle */}
-              <p className="text-[11px] font-mono text-accent-ice/50 uppercase tracking-wider mb-4">
+              <p className="text-[11px] font-mono text-accent-ice/70 uppercase tracking-wider mb-4">
                 {service.pillarTitle}
               </p>
 
@@ -306,7 +306,7 @@ export default function ServicesFilterDrawer({
             </div>
 
             <div className="text-right hidden md:block">
-              <span className="text-xs font-mono text-accent-ice/50 block">Arquitectura Legal</span>
+              <span className="text-xs font-mono text-accent-ice/70 block">Arquitectura Legal</span>
               <span className="text-xs font-mono text-accent-gold block font-semibold">100% Personalizada</span>
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function ServicesFilterDrawer({
             {/* Scope */}
             <div className="space-y-6 text-sm text-accent-ice/85 leading-relaxed mb-8">
               <div>
-                <h4 className="text-xs font-mono text-accent-ice/50 uppercase tracking-widest mb-2">
+                <h4 className="text-xs font-mono text-accent-ice/70 uppercase tracking-widest mb-2">
                   Alcance Detallado &amp; Enfoque Estratégico:
                 </h4>
                 <p className="text-primary-light/90 text-sm md:text-base leading-relaxed">
@@ -365,7 +365,7 @@ export default function ServicesFilterDrawer({
 
               {/* Deliverables */}
               <div>
-                <h4 className="text-xs font-mono text-accent-ice/50 uppercase tracking-widest mb-3">
+                <h4 className="text-xs font-mono text-accent-ice/70 uppercase tracking-widest mb-3">
                   Entregables &amp; Soluciones Tangibles:
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -383,7 +383,7 @@ export default function ServicesFilterDrawer({
 
               {/* Typical Cases */}
               <div>
-                <h4 className="text-xs font-mono text-accent-ice/50 uppercase tracking-widest mb-3">
+                <h4 className="text-xs font-mono text-accent-ice/70 uppercase tracking-widest mb-3">
                   Casos de Intervención Frecuentes:
                 </h4>
                 <ul className="space-y-2">
@@ -401,7 +401,7 @@ export default function ServicesFilterDrawer({
 
               {/* Audience */}
               <div className="pt-2">
-                <span className="text-xs font-mono text-accent-ice/50 uppercase tracking-widest block mb-1">
+                <span className="text-xs font-mono text-accent-ice/70 uppercase tracking-widest block mb-1">
                   Público Objetivo &amp; Clientes Ideales:
                 </span>
                 <span className="text-xs font-sans text-accent-gold italic">

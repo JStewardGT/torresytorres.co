@@ -39,9 +39,8 @@ export default function Header({ onOpenMenu, onOpenConsultation }: HeaderProps) 
         <button
           onClick={() => scrollTo('#hero')}
           className="flex items-center space-x-3.5 group text-left focus:outline-none"
-          aria-label="Ir al inicio de TORRES & TORRES"
         >
-          <div className="w-10 h-10 rounded-full border border-accent-gold/40 group-hover:border-accent-gold flex items-center justify-center transition-all duration-300 bg-secondary-dark/40 group-hover:shadow-glow-gold">
+          <div aria-hidden="true" className="w-10 h-10 rounded-full border border-accent-gold/40 group-hover:border-accent-gold flex items-center justify-center transition-all duration-300 bg-secondary-dark/40 group-hover:shadow-glow-gold">
             <span className="font-display font-medium text-lg text-accent-gold tracking-tight">
               T&T
             </span>

@@ -153,7 +153,7 @@ export default function PracticeCarouselSection({
 
         {/* Carousel Controls */}
         <div className="flex items-center space-x-4 self-start md:self-end">
-          <div className="flex items-center space-x-2 text-xs font-mono text-accent-ice/50 mr-4">
+          <div className="flex items-center space-x-2 text-xs font-mono text-accent-ice/70 mr-4">
             <span className="text-accent-gold font-bold">{String(activeIndex + 1).padStart(2, '0')}</span>
             <span>/</span>
             <span>{String(pillarsCount).padStart(2, '0')}</span>
@@ -219,12 +219,12 @@ export default function PracticeCarouselSection({
               <div
                 key={pillar.id}
                 onClick={() => handleCardClick(index)}
-                className={`col-start-1 row-start-1 w-full max-w-3xl rounded-2xl bg-secondary-dark/95 border shadow-luxury preserve-3d overflow-hidden motion-reduce:!transition-none ${
+                className={`col-start-1 row-start-1 w-full max-w-3xl rounded-2xl border shadow-luxury preserve-3d overflow-hidden motion-reduce:!transition-none ${
                   isActive
-                    ? 'relative border-accent-ice/30 shadow-glow-ice'
-                    : 'absolute max-md:inset-x-0 max-md:top-0 md:relative invisible pointer-events-none opacity-0 border-accent-ice/10 hover:border-accent-ice/20 cursor-pointer'
+                    ? 'relative bg-secondary-dark border-accent-ice/30 shadow-glow-ice'
+                    : 'absolute max-md:inset-x-0 max-md:top-0 md:relative invisible pointer-events-none opacity-0 bg-primary-dark border-accent-ice/10 hover:border-accent-ice/20 cursor-pointer'
                 } ${
-                  !isActive && !isHidden ? 'md:visible md:pointer-events-auto md:opacity-[0.45]' : ''
+                  !isActive && !isHidden ? 'md:visible md:pointer-events-auto md:opacity-100' : ''
                 }`}
                 style={{
                   transform,
@@ -251,7 +251,7 @@ export default function PracticeCarouselSection({
                           {pillar.code}
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-accent-ice/50">
+                      <span className="text-xs font-mono text-accent-ice/70">
                         {pillar.serviceIds.length} Especialidades Incluidas
                       </span>
                     </div>
@@ -269,7 +269,7 @@ export default function PracticeCarouselSection({
 
                     {/* Included Services Tags */}
                     <div className="mb-8">
-                      <span className="text-[11px] font-mono text-accent-ice/40 uppercase tracking-widest block mb-2.5">
+                      <span className="text-[11px] font-mono text-accent-ice/70 uppercase tracking-widest block mb-2.5">
                         Servicios dentro de este pilar:
                       </span>
                       <div className="flex flex-wrap gap-2">

@@ -8,9 +8,8 @@ function ArchitecturalStructure() {
   const meshRef = useRef<THREE.Group>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const particlesRef = useRef<THREE.Points>(null);
-  const { gl, invalidate, size } = useThree();
+  const { gl, invalidate, setDpr, size } = useThree();
   const compact = size.width < 768;
-  const spin = useRef(false);
 
   const parallax = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
 
@@ -28,12 +27,24 @@ function ArchitecturalStructure() {
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setDpr(compact ? 1 : [1, 1.5]);
 
     if (compact) {
       let visible = false;
+      let spinTimer: number | undefined;
       const updateSpin = () => {
-        spin.current = visible && !reducedMotion.matches;
-        if (spin.current) invalidate();
+        window.clearInterval(spinTimer);
+        const mesh = meshRef.current;
+        if (!mesh || !visible || document.hidden || reducedMotion.matches) return;
+
+        const startAngle = mesh.rotation.y;
+        const startTime = performance.now();
+        const fullTurn = 2 * Math.PI;
+        spinTimer = window.setInterval(() => {
+          const turns = (performance.now() - startTime) / 60_000;
+          mesh.rotation.y = (startAngle + turns * fullTurn) % fullTurn;
+          invalidate();
+        }, 1000 / 30);
       };
       const observer = new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
@@ -41,11 +52,13 @@ function ArchitecturalStructure() {
       });
       observer.observe(gl.domElement);
       reducedMotion.addEventListener('change', updateSpin);
+      document.addEventListener('visibilitychange', updateSpin);
 
       return () => {
         observer.disconnect();
         reducedMotion.removeEventListener('change', updateSpin);
-        spin.current = false;
+        document.removeEventListener('visibilitychange', updateSpin);
+        window.clearInterval(spinTimer);
       };
     }
 
@@ -74,16 +87,10 @@ function ArchitecturalStructure() {
       window.removeEventListener('pointermove', updatePointer);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [compact, gl, invalidate]);
+  }, [compact, gl, invalidate, setDpr]);
 
-  useFrame((_, delta) => {
-    if (compact) {
-      if (spin.current && meshRef.current) {
-        meshRef.current.rotation.y = (meshRef.current.rotation.y + Math.min(delta, 0.05) * Math.PI * 2 / 60) % (Math.PI * 2);
-        invalidate();
-      }
-      return;
-    }
+  useFrame(() => {
+    if (compact) return;
 
     const pointer = parallax.current;
     const dx = pointer.targetX - pointer.x;

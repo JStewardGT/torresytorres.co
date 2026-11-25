@@ -20,7 +20,7 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
     () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      // Keep the headline visible while the supporting content animates.
+      // Keep the heading and summary visible while secondary elements animate.
       const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.1 } });
 
       tl.fromTo(
@@ -28,12 +28,6 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.8, delay: 0.2 }
       )
-        .fromTo(
-          '.hero-subtext',
-          { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 0.9 },
-          '-=0.6'
-        )
         .fromTo(
           '.hero-action-btn',
           { opacity: 0, y: 20 },
@@ -95,7 +89,7 @@ export default function HeroSection({ onOpenConsultation }: HeroSectionProps) {
         </h1>
 
         {/* Subtitle / Philosophy */}
-        <p className="hero-subtext max-w-2xl font-sans text-base md:text-lg text-accent-ice/80 font-normal leading-relaxed mb-6 md:mb-10">
+        <p className="max-w-2xl font-sans text-base md:text-lg text-accent-ice/80 font-normal leading-relaxed mb-6 md:mb-10">
           En <strong className="text-primary-light font-medium">TORRES &amp; TORRES Abogados Asociados</strong> conjugamos la pulcritud del derecho clásico con una visión empresarial audaz para blindar transacciones, resolver controversias complejas y preservar patrimonios decisivos.
         </p>
 
